@@ -1,7 +1,7 @@
 package rediscache
 
 import (
-	"github.com/hpifu/account/internal/mysqldb"
+	"github.com/hpifu/go-account/internal/mysqldb"
 	. "github.com/smartystreets/goconvey/convey"
 	"testing"
 	"time"

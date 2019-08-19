@@ -2,8 +2,8 @@ package mysqldb
 
 import (
 	"fmt"
-	"github.com/hpifu/account/internal/c"
-	"github.com/hpifu/account/internal/rule"
+	"github.com/hpifu/go-account/internal/c"
+	"github.com/hpifu/go-account/internal/rule"
 	"github.com/jinzhu/gorm"
 	"strings"
 	"time"

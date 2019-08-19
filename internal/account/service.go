@@ -3,9 +3,9 @@ package account
 import (
 	"encoding/hex"
 	"fmt"
-	"github.com/hpifu/account/internal/mail"
-	"github.com/hpifu/account/internal/mysqldb"
-	"github.com/hpifu/account/internal/rediscache"
+	"github.com/hpifu/go-account/internal/mail"
+	"github.com/hpifu/go-account/internal/mysqldb"
+	"github.com/hpifu/go-account/internal/rediscache"
 	"github.com/sirupsen/logrus"
 	"math/rand"
 	"time"

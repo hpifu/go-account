@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/hpifu/account/internal/mail"
-	"github.com/hpifu/account/internal/rule"
+	"github.com/hpifu/go-account/internal/mail"
+	"github.com/hpifu/go-account/internal/rule"
 	"github.com/sirupsen/logrus"
 	"net/http"
 )

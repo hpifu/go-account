@@ -2,10 +2,10 @@ package rediscache
 
 import (
 	"encoding/json"
-	"github.com/hpifu/account/internal/c"
+	"github.com/hpifu/go-account/internal/c"
 	"time"
 	"github.com/go-redis/redis"
-	"github.com/hpifu/account/internal/mysqldb"
+	"github.com/hpifu/go-account/internal/mysqldb"
 )
 
 type Option struct {
