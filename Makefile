@@ -22,6 +22,9 @@ deploy:
 remove:
 	docker stack rm ${repository}
 
+push:
+	docker push ${user}/${repository}:${version}
+
 .PHONY: buildenv
 buildenv:
 	docker run --rm --name go-build-env -d golang:1.12.5 tail -f /dev/null
