@@ -1,0 +1,38 @@
+{
+    "service": {
+        "port": ":6060"
+    },
+    "mysqldb": {
+        "uri": "hatlonely:keaiduo1@tcp(mysql:3306)/hads?charset=utf8&parseTime=True&loc=Local"
+    },
+    "rediscache": {
+        "address": "redis:6379",
+        "timeout": "20ms",
+        "retries": 3,
+        "poolSize": 4,
+        "password": "",
+        "db": 0,
+        "tokenExpiration": "3h",
+        "authCodeExpiration": "2m"
+    },
+    "mail": {
+        "password": "iwvxfcvxljrxbfed",
+        "from": "hatlonely@foxmail.com",
+        "server": "smtp.qq.com",
+        "port": 25
+    },
+    "logger": {
+        "infoLog": {
+            "filename": "log/account.info",
+            "maxAge": "24h"
+        },
+        "warnLog": {
+            "filename": "log/account.warn",
+            "maxAge": "24h"
+        },
+        "accessLog": {
+            "filename": "log/account.access",
+            "maxAge": "24h"
+        }
+    }
+}

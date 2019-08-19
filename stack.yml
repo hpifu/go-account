@@ -1,0 +1,26 @@
+version: "3.5"
+services:
+  account:
+    image: hatlonely/account:v1.0.0
+    hostname: account
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "6060:6060"
+    volumes:
+      - "/var/docker/account/log:/var/docker/account/log"
+    networks:
+      - accountnet
+      - mysqlnet
+      - redisnet
+networks:
+  accountnet:
+    name: accountnet
+  redisnet:
+    external: true
+    name: redisnet
+  mysqlnet:
+    external: true
+    name: mysqlnet
