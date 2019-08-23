@@ -9,8 +9,8 @@ services:
         condition: on-failure
     ports:
       - "6060:6060"
-    volumes:
-      - "/var/docker/account/log:/var/docker/account/log"
+    # volumes:
+    #   - "/var/docker/account/log:/var/docker/account/log"
     networks:
       - accountnet
       - mysqlnet

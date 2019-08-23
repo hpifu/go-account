@@ -15,13 +15,11 @@ type Account struct {
 	Gender    c.Gender `json:"gender"`
 }
 
-type GetAccountReqParm struct {
+type GetAccountReq struct {
 	Token string `json:"token,omitempty"`
 }
 
-type GetAccountReqBody struct{}
-
-type GetAccountResBody struct {
+type GetAccountRes struct {
 	OK      bool     `json:"ok"`
 	Account *Account `json:"account"`
 }

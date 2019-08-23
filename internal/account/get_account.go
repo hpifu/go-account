@@ -11,11 +11,10 @@ import (
 
 func (s *Service) GetAccount(c *gin.Context) {
 	rid := c.DefaultQuery("rid", NewToken())
-	parm := &api.GetAccountReqParm{
+	req := &api.GetAccountReq{
 		Token: c.DefaultQuery("token", ""),
 	}
-	req := &api.GetAccountReqBody{}
-	var res *api.GetAccountResBody
+	var res *api.GetAccountRes
 	var err error
 	var buf []byte
 	status := http.StatusOK
@@ -33,7 +32,7 @@ func (s *Service) GetAccount(c *gin.Context) {
 		}).Info()
 	}()
 
-	if err = s.checkGetAccountReqBody(parm, req); err != nil {
+	if err = s.checkGetAccountReqBody(req); err != nil {
 		err = fmt.Errorf("check request body failed. body: [%v], err: [%v]", string(buf), err)
 		WarnLog.WithField("@rid", rid).WithField("err", err).Warn()
 		status = http.StatusBadRequest
@@ -41,7 +40,7 @@ func (s *Service) GetAccount(c *gin.Context) {
 		return
 	}
 
-	res, err = s.getAccount(parm, req)
+	res, err = s.getAccount(req)
 	if err != nil {
 		WarnLog.WithField("@rid", rid).WithField("err", err).Warn("getAccount failed")
 		status = http.StatusInternalServerError
@@ -53,9 +52,9 @@ func (s *Service) GetAccount(c *gin.Context) {
 	c.JSON(status, res)
 }
 
-func (s *Service) checkGetAccountReqBody(parm *api.GetAccountReqParm, req *api.GetAccountReqBody) error {
+func (s *Service) checkGetAccountReqBody(req *api.GetAccountReq) error {
 	if err := rule.Check(map[interface{}][]rule.Rule{
-		parm.Token: {rule.Required},
+		req.Token: {rule.Required},
 	}); err != nil {
 		return err
 	}
@@ -63,16 +62,16 @@ func (s *Service) checkGetAccountReqBody(parm *api.GetAccountReqParm, req *api.G
 	return nil
 }
 
-func (s *Service) getAccount(parm *api.GetAccountReqParm, req *api.GetAccountReqBody) (*api.GetAccountResBody, error) {
-	account, err := s.cache.GetAccount(parm.Token)
+func (s *Service) getAccount(req *api.GetAccountReq) (*api.GetAccountRes, error) {
+	account, err := s.cache.GetAccount(req.Token)
 	if err != nil {
 		return nil, err
 	}
 	if account == nil {
-		return &api.GetAccountResBody{OK: false}, nil
+		return &api.GetAccountRes{OK: false}, nil
 	}
 
-	return &api.GetAccountResBody{
+	return &api.GetAccountRes{
 		OK: true,
 		Account: &api.Account{
 			ID:        account.ID,
