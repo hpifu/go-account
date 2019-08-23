@@ -4,31 +4,20 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/hpifu/go-account/internal/rule"
+	api "github.com/hpifu/go-account/pkg/account"
 	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
-type VerifyAuthCodeReqBody struct {
-	Type  string `json:"type,omitempty"`
-	Phone string `json:"phone,omitempty"`
-	Email string `json:"email,omitempty"`
-	Code  string `json:"code,omitempty"`
-}
-
-type VerifyAuthCodeResBody struct {
-	OK  bool   `json:"ok"`
-	Tip string `json:"tip"`
-}
-
 func (s *Service) VerifyAuthCode(c *gin.Context) {
 	rid := c.DefaultQuery("rid", NewToken())
-	req := &VerifyAuthCodeReqBody{
+	req := &api.VerifyAuthCodeReq{
 		Type:  c.DefaultQuery("type", ""),
 		Phone: c.DefaultQuery("phone", ""),
 		Email: c.DefaultQuery("email", ""),
 		Code:  c.DefaultQuery("code", ""),
 	}
-	var res *VerifyAuthCodeResBody
+	var res *api.VerifyAuthCodeRes
 	var err error
 	var buf []byte
 	status := http.StatusOK
@@ -66,7 +55,7 @@ func (s *Service) VerifyAuthCode(c *gin.Context) {
 	c.JSON(status, res)
 }
 
-func (s *Service) checkVerifyAuthCodeReqBody(req *VerifyAuthCodeReqBody) error {
+func (s *Service) checkVerifyAuthCodeReqBody(req *api.VerifyAuthCodeReq) error {
 	if err := rule.Check(map[interface{}][]rule.Rule{
 		req.Type: {rule.Required, rule.In(map[interface{}]struct{}{"phone": {}, "email": {}})},
 		req.Code: {rule.Required, rule.ValidCode},
@@ -88,19 +77,19 @@ func (s *Service) checkVerifyAuthCodeReqBody(req *VerifyAuthCodeReqBody) error {
 	return nil
 }
 
-func (s *Service) verifyAuthCode(req *VerifyAuthCodeReqBody) (*VerifyAuthCodeResBody, error) {
+func (s *Service) verifyAuthCode(req *api.VerifyAuthCodeReq) (*api.VerifyAuthCodeRes, error) {
 	if req.Type == "phone" {
 		code, err := s.cache.GetAuthCode(req.Phone)
 		if err != nil {
 			return nil, err
 		}
 		if code == "" {
-			return &VerifyAuthCodeResBody{OK: false, Tip: "验证码不存在"}, nil
+			return &api.VerifyAuthCodeRes{OK: false, Tip: "验证码不存在"}, nil
 		}
 		if code != req.Code {
-			return &VerifyAuthCodeResBody{OK: false, Tip: "验证失败"}, nil
+			return &api.VerifyAuthCodeRes{OK: false, Tip: "验证失败"}, nil
 		}
-		return &VerifyAuthCodeResBody{OK: true}, nil
+		return &api.VerifyAuthCodeRes{OK: true}, nil
 	}
 
 	if req.Type == "email" {
@@ -109,13 +98,13 @@ func (s *Service) verifyAuthCode(req *VerifyAuthCodeReqBody) (*VerifyAuthCodeRes
 			return nil, err
 		}
 		if code == "" {
-			return &VerifyAuthCodeResBody{OK: false, Tip: "验证码不存在"}, nil
+			return &api.VerifyAuthCodeRes{OK: false, Tip: "验证码不存在"}, nil
 		}
 		if code != req.Code {
-			return &VerifyAuthCodeResBody{OK: false, Tip: "验证失败"}, nil
+			return &api.VerifyAuthCodeRes{OK: false, Tip: "验证失败"}, nil
 		}
-		return &VerifyAuthCodeResBody{OK: true}, nil
+		return &api.VerifyAuthCodeRes{OK: true}, nil
 	}
 
-	return &VerifyAuthCodeResBody{OK: false, Tip: fmt.Sprintf("未知字段 [%v]", req.Type)}, nil
+	return &api.VerifyAuthCodeRes{OK: false, Tip: fmt.Sprintf("未知字段 [%v]", req.Type)}, nil
 }

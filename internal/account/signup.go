@@ -14,8 +14,8 @@ import (
 
 func (s *Service) SignUp(c *gin.Context) {
 	rid := c.DefaultQuery("rid", NewToken())
-	req := &api.SignUpReqBody{}
-	var res *api.SignUpResBody
+	req := &api.SignUpReq{}
+	var res *api.SignUpRes
 	var err error
 	status := http.StatusOK
 
@@ -60,7 +60,7 @@ func (s *Service) SignUp(c *gin.Context) {
 	c.JSON(status, res)
 }
 
-func (s *Service) checkSignUpReqBody(req *api.SignUpReqBody) error {
+func (s *Service) checkSignUpReqBody(req *api.SignUpReq) error {
 	if err := rule.Check(map[interface{}][]rule.Rule{
 		req.Password: {rule.Required, rule.AtLeast8Characters},
 		req.Birthday: {rule.Required, rule.ValidBirthday},
@@ -94,7 +94,7 @@ func (s *Service) checkSignUpReqBody(req *api.SignUpReqBody) error {
 	return nil
 }
 
-func (s *Service) signUp(req *api.SignUpReqBody) (*api.SignUpResBody, error) {
+func (s *Service) signUp(req *api.SignUpReq) (*api.SignUpRes, error) {
 	birthday, _ := time.Parse("2006-01-02", req.Birthday)
 	ok, err := s.db.InsertAccount(&mysqldb.Account{
 		Phone:     req.Phone,
@@ -106,5 +106,5 @@ func (s *Service) signUp(req *api.SignUpReqBody) (*api.SignUpResBody, error) {
 		Gender:    req.Gender,
 	})
 
-	return &api.SignUpResBody{Success: ok}, err
+	return &api.SignUpRes{Success: ok}, err
 }

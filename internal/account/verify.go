@@ -4,27 +4,18 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/hpifu/go-account/internal/rule"
+	api "github.com/hpifu/go-account/pkg/account"
 	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
-type VerifyReqBody struct {
-	Field string `json:"field,omitempty"`
-	Value string `json:"value,omitempty"`
-}
-
-type VerifyResBody struct {
-	OK  bool   `json:"ok"`
-	Tip string `json:"tip"`
-}
-
 func (s *Service) Verify(c *gin.Context) {
 	rid := c.DefaultQuery("rid", NewToken())
-	req := &VerifyReqBody{
+	req := &api.VerifyReqBody{
 		Field: c.DefaultQuery("field", ""),
 		Value: c.DefaultQuery("value", ""),
 	}
-	var res *VerifyResBody
+	var res *api.VerifyResBody
 	var err error
 	var buf []byte
 	status := http.StatusOK
@@ -62,7 +53,7 @@ func (s *Service) Verify(c *gin.Context) {
 	c.JSON(status, res)
 }
 
-func (s *Service) checkVerifyReqBody(req *VerifyReqBody) error {
+func (s *Service) checkVerifyReqBody(req *api.VerifyReqBody) error {
 	if err := rule.Check(map[interface{}][]rule.Rule{
 		req.Field: {rule.Required, rule.In(map[interface{}]struct{}{"phone": {}, "email": {}, "username": {}})},
 		req.Value: {rule.Required},
@@ -73,16 +64,16 @@ func (s *Service) checkVerifyReqBody(req *VerifyReqBody) error {
 	return nil
 }
 
-func (s *Service) verify(req *VerifyReqBody) (*VerifyResBody, error) {
+func (s *Service) verify(req *api.VerifyReqBody) (*api.VerifyResBody, error) {
 	if req.Field == "phone" {
 		account, err := s.db.SelectAccountByPhone(req.Value)
 		if err != nil {
 			return nil, err
 		}
 		if account == nil {
-			return &VerifyResBody{OK: true}, nil
+			return &api.VerifyResBody{OK: true}, nil
 		}
-		return &VerifyResBody{OK: false, Tip: "电话号码已存在"}, nil
+		return &api.VerifyResBody{OK: false, Tip: "电话号码已存在"}, nil
 	}
 
 	if req.Field == "email" {
@@ -91,9 +82,9 @@ func (s *Service) verify(req *VerifyReqBody) (*VerifyResBody, error) {
 			return nil, err
 		}
 		if account == nil {
-			return &VerifyResBody{OK: true}, nil
+			return &api.VerifyResBody{OK: true}, nil
 		}
-		return &VerifyResBody{OK: false, Tip: "邮箱已存在"}, nil
+		return &api.VerifyResBody{OK: false, Tip: "邮箱已存在"}, nil
 	}
 
 	if req.Field == "username" {
@@ -102,10 +93,10 @@ func (s *Service) verify(req *VerifyReqBody) (*VerifyResBody, error) {
 			return nil, err
 		}
 		if account == nil {
-			return &VerifyResBody{OK: false, Tip: "账号不存在"}, nil
+			return &api.VerifyResBody{OK: false, Tip: "账号不存在"}, nil
 		}
-		return &VerifyResBody{OK: true}, nil
+		return &api.VerifyResBody{OK: true}, nil
 	}
 
-	return &VerifyResBody{OK: false, Tip: fmt.Sprintf("未知字段 [%v]", req.Field)}, nil
+	return &api.VerifyResBody{OK: false, Tip: fmt.Sprintf("未知字段 [%v]", req.Field)}, nil
 }

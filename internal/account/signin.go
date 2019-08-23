@@ -6,24 +6,15 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hpifu/go-account/internal/rediscache"
 	"github.com/hpifu/go-account/internal/rule"
+	api "github.com/hpifu/go-account/pkg/account"
 	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
-type SignInReqBody struct {
-	Username string `json:"username,omitempty"`
-	Password string `json:"password,omitempty"`
-}
-
-type SignInResBody struct {
-	Valid bool   `json:"valid"`
-	Token string `json:"token"`
-}
-
 func (s *Service) SignIn(c *gin.Context) {
 	rid := c.DefaultQuery("rid", NewToken())
-	req := &SignInReqBody{}
-	var res *SignInResBody
+	req := &api.SignInReq{}
+	var res *api.SignInRes
 	var err error
 	var buf []byte
 	status := http.StatusOK
@@ -83,7 +74,7 @@ func (s *Service) SignIn(c *gin.Context) {
 	c.JSON(status, res)
 }
 
-func (s *Service) checkSignInReqBody(req *SignInReqBody) error {
+func (s *Service) checkSignInReqBody(req *api.SignInReq) error {
 	if err := rule.Check(map[interface{}][]rule.Rule{
 		req.Username: {rule.Required},
 		req.Password: {rule.Required, rule.AtLeast8Characters},
@@ -94,18 +85,18 @@ func (s *Service) checkSignInReqBody(req *SignInReqBody) error {
 	return nil
 }
 
-func (s *Service) signIn(req *SignInReqBody) (*SignInResBody, error) {
+func (s *Service) signIn(req *api.SignInReq) (*api.SignInRes, error) {
 	account, err := s.db.SelectAccountByPhoneOrEmail(req.Username)
 	if err != nil {
 		return nil, err
 	}
 
 	if account == nil {
-		return &SignInResBody{Valid: false}, nil
+		return &api.SignInRes{Valid: false}, nil
 	}
 
 	if account.Password != req.Password {
-		return &SignInResBody{Valid: false}, nil
+		return &api.SignInRes{Valid: false}, nil
 	}
 
 	token := NewToken()
@@ -113,5 +104,5 @@ func (s *Service) signIn(req *SignInReqBody) (*SignInResBody, error) {
 		return nil, err
 	}
 
-	return &SignInResBody{Valid: true, Token: token}, nil
+	return &api.SignInRes{Valid: true, Token: token}, nil
 }

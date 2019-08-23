@@ -6,33 +6,16 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hpifu/go-account/internal/c"
 	"github.com/hpifu/go-account/internal/rule"
+	api "github.com/hpifu/go-account/pkg/account"
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"time"
 )
 
-type UpdateReqBody struct {
-	Token       string   `json:"token"`
-	Field       string   `json:"field,omitempty"`
-	Email       string   `json:"email,omitempty"`
-	Phone       string   `json:"phone,omitempty"`
-	FirstName   string   `json:"firstName,omitempty"`
-	LastName    string   `json:"lastName,omitempty"`
-	Birthday    string   `json:"birthday,omitempty"`
-	Password    string   `json:"password,omitempty"`
-	OldPassword string   `json:"oldPassword,omitempty"`
-	Gender      c.Gender `json:"gender,omitempty"`
-}
-
-type UpdateResBody struct {
-	OK  bool   `json:"ok"`
-	Err string `json:"err"`
-}
-
 func (s *Service) Update(c *gin.Context) {
 	rid := c.DefaultQuery("rid", NewToken())
-	req := &UpdateReqBody{}
-	var res *UpdateResBody
+	req := &api.UpdateReq{}
+	var res *api.UpdateRes
 	var err error
 	var buf []byte
 	status := http.StatusOK
@@ -87,7 +70,7 @@ func (s *Service) Update(c *gin.Context) {
 	c.JSON(status, res)
 }
 
-func (s *Service) checkUpdateReqBody(req *UpdateReqBody) error {
+func (s *Service) checkUpdateReqBody(req *api.UpdateReq) error {
 	if err := rule.Check(map[interface{}][]rule.Rule{
 		req.Token: {rule.Required},
 		req.Field: {rule.Required, rule.In(map[interface{}]struct{}{
@@ -133,14 +116,14 @@ func (s *Service) checkUpdateReqBody(req *UpdateReqBody) error {
 	return nil
 }
 
-func (s *Service) update(req *UpdateReqBody) (*UpdateResBody, error) {
+func (s *Service) update(req *api.UpdateReq) (*api.UpdateRes, error) {
 	account, err := s.cache.GetAccount(req.Token)
 	if err != nil {
 		return nil, err
 	}
 
 	if account == nil {
-		return &UpdateResBody{OK: false, Err: "会话已过期，请重新登录"}, nil
+		return &api.UpdateRes{OK: false, Err: "会话已过期，请重新登录"}, nil
 	}
 
 	var ok bool
@@ -153,7 +136,7 @@ func (s *Service) update(req *UpdateReqBody) (*UpdateResBody, error) {
 		account.Email = req.Email
 	case "password":
 		if req.OldPassword != account.Password {
-			return &UpdateResBody{OK: false, Err: fmt.Sprintf("密码错误")}, nil
+			return &api.UpdateRes{OK: false, Err: fmt.Sprintf("密码错误")}, nil
 		}
 		ok, err = s.db.UpdateAccountPassword(account.ID, req.Password)
 	case "gender":
@@ -168,7 +151,7 @@ func (s *Service) update(req *UpdateReqBody) (*UpdateResBody, error) {
 		ok, err = s.db.UpdateAccountBirthday(account.ID, birthday)
 		account.Birthday = req.Birthday
 	default:
-		return &UpdateResBody{OK: false, Err: fmt.Sprintf("未知字段 [%v]", req.Field)}, nil
+		return &api.UpdateRes{OK: false, Err: fmt.Sprintf("未知字段 [%v]", req.Field)}, nil
 	}
 
 	if err != nil {
@@ -179,5 +162,5 @@ func (s *Service) update(req *UpdateReqBody) (*UpdateResBody, error) {
 		return nil, err
 	}
 
-	return &UpdateResBody{OK: ok}, nil
+	return &api.UpdateRes{OK: ok}, nil
 }

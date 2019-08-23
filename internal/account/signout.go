@@ -4,24 +4,17 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/hpifu/go-account/internal/rule"
+	api "github.com/hpifu/go-account/pkg/account"
 	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
-type SignOutReqBody struct {
-	Token string `json:"token,omitempty"`
-}
-
-type SignOutResBody struct {
-	OK bool `json:"ok"`
-}
-
 func (s *Service) SignOut(c *gin.Context) {
 	rid := c.DefaultQuery("rid", NewToken())
-	req := &SignOutReqBody{
+	req := &api.SignOutReq{
 		Token: c.DefaultQuery("token", ""),
 	}
-	var res *SignOutResBody
+	var res *api.SignOutRes
 	var err error
 	var buf []byte
 	status := http.StatusOK
@@ -59,7 +52,7 @@ func (s *Service) SignOut(c *gin.Context) {
 	c.JSON(status, res)
 }
 
-func (s *Service) checkSignOutReqBody(req *SignOutReqBody) error {
+func (s *Service) checkSignOutReqBody(req *api.SignOutReq) error {
 	if err := rule.Check(map[interface{}][]rule.Rule{
 		req.Token: {rule.Required},
 	}); err != nil {
@@ -69,10 +62,10 @@ func (s *Service) checkSignOutReqBody(req *SignOutReqBody) error {
 	return nil
 }
 
-func (s *Service) signOut(req *SignOutReqBody) (*SignOutResBody, error) {
+func (s *Service) signOut(req *api.SignOutReq) (*api.SignOutRes, error) {
 	err := s.cache.DelAccount(req.Token)
 	if err != nil {
 		return nil, err
 	}
-	return &SignOutResBody{OK: true}, nil
+	return &api.SignOutRes{OK: true}, nil
 }

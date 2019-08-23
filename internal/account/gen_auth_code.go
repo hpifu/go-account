@@ -6,26 +6,15 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hpifu/go-account/internal/mail"
 	"github.com/hpifu/go-account/internal/rule"
+	api "github.com/hpifu/go-account/pkg/account"
 	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
-type GenAuthCodeReqBody struct {
-	Type      string `json:"type"`
-	FirstName string `json:"firstName,omitempty"`
-	LastName  string `json:"lastName,omitempty"`
-	Email     string `json:"email,omitempty"`
-	Phone     string `json:"phone,omitempty"`
-}
-
-type GenAuthCodeResBody struct {
-	OK bool `json:"ok"`
-}
-
 func (s *Service) GenAuthCode(c *gin.Context) {
 	rid := c.DefaultQuery("rid", NewToken())
-	req := &GenAuthCodeReqBody{}
-	var res *GenAuthCodeResBody
+	req := &api.GenAuthCodeReq{}
+	var res *api.GenAuthCodeRes
 	var err error
 	var buf []byte
 	status := http.StatusOK
@@ -80,7 +69,7 @@ func (s *Service) GenAuthCode(c *gin.Context) {
 	c.JSON(status, res)
 }
 
-func (s *Service) checkGenAuthCodeReqBody(req *GenAuthCodeReqBody) error {
+func (s *Service) checkGenAuthCodeReqBody(req *api.GenAuthCodeReq) error {
 	if err := rule.Check(map[interface{}][]rule.Rule{
 		req.Type: {rule.Required, rule.In(map[interface{}]struct{}{
 			"email": {}, "phone": {},
@@ -105,7 +94,7 @@ func (s *Service) checkGenAuthCodeReqBody(req *GenAuthCodeReqBody) error {
 	return nil
 }
 
-func (s *Service) genAuthCode(req *GenAuthCodeReqBody) (*GenAuthCodeResBody, error) {
+func (s *Service) genAuthCode(req *api.GenAuthCodeReq) (*api.GenAuthCodeRes, error) {
 	code, err := s.cache.GetAuthCode(req.Email)
 	if err != nil {
 		return nil, err
@@ -128,5 +117,5 @@ func (s *Service) genAuthCode(req *GenAuthCodeReqBody) (*GenAuthCodeResBody, err
 		}
 	}
 
-	return &GenAuthCodeResBody{OK: true}, nil
+	return &api.GenAuthCodeRes{OK: true}, nil
 }
