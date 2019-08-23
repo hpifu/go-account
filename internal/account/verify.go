@@ -11,11 +11,11 @@ import (
 
 func (s *Service) Verify(c *gin.Context) {
 	rid := c.DefaultQuery("rid", NewToken())
-	req := &api.VerifyReqBody{
+	req := &api.VerifyReq{
 		Field: c.DefaultQuery("field", ""),
 		Value: c.DefaultQuery("value", ""),
 	}
-	var res *api.VerifyResBody
+	var res *api.VerifyRes
 	var err error
 	var buf []byte
 	status := http.StatusOK
@@ -53,7 +53,7 @@ func (s *Service) Verify(c *gin.Context) {
 	c.JSON(status, res)
 }
 
-func (s *Service) checkVerifyReqBody(req *api.VerifyReqBody) error {
+func (s *Service) checkVerifyReqBody(req *api.VerifyReq) error {
 	if err := rule.Check(map[interface{}][]rule.Rule{
 		req.Field: {rule.Required, rule.In(map[interface{}]struct{}{"phone": {}, "email": {}, "username": {}})},
 		req.Value: {rule.Required},
@@ -64,16 +64,16 @@ func (s *Service) checkVerifyReqBody(req *api.VerifyReqBody) error {
 	return nil
 }
 
-func (s *Service) verify(req *api.VerifyReqBody) (*api.VerifyResBody, error) {
+func (s *Service) verify(req *api.VerifyReq) (*api.VerifyRes, error) {
 	if req.Field == "phone" {
 		account, err := s.db.SelectAccountByPhone(req.Value)
 		if err != nil {
 			return nil, err
 		}
 		if account == nil {
-			return &api.VerifyResBody{OK: true}, nil
+			return &api.VerifyRes{OK: true}, nil
 		}
-		return &api.VerifyResBody{OK: false, Tip: "电话号码已存在"}, nil
+		return &api.VerifyRes{OK: false, Tip: "电话号码已存在"}, nil
 	}
 
 	if req.Field == "email" {
@@ -82,9 +82,9 @@ func (s *Service) verify(req *api.VerifyReqBody) (*api.VerifyResBody, error) {
 			return nil, err
 		}
 		if account == nil {
-			return &api.VerifyResBody{OK: true}, nil
+			return &api.VerifyRes{OK: true}, nil
 		}
-		return &api.VerifyResBody{OK: false, Tip: "邮箱已存在"}, nil
+		return &api.VerifyRes{OK: false, Tip: "邮箱已存在"}, nil
 	}
 
 	if req.Field == "username" {
@@ -93,10 +93,10 @@ func (s *Service) verify(req *api.VerifyReqBody) (*api.VerifyResBody, error) {
 			return nil, err
 		}
 		if account == nil {
-			return &api.VerifyResBody{OK: false, Tip: "账号不存在"}, nil
+			return &api.VerifyRes{OK: false, Tip: "账号不存在"}, nil
 		}
-		return &api.VerifyResBody{OK: true}, nil
+		return &api.VerifyRes{OK: true}, nil
 	}
 
-	return &api.VerifyResBody{OK: false, Tip: fmt.Sprintf("未知字段 [%v]", req.Field)}, nil
+	return &api.VerifyRes{OK: false, Tip: fmt.Sprintf("未知字段 [%v]", req.Field)}, nil
 }
