@@ -3,27 +3,19 @@ package account
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/hpifu/go-account/internal/rediscache"
 	"github.com/hpifu/go-account/internal/rule"
+	api "github.com/hpifu/go-account/pkg/account"
 	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
-type GetAccountReqBody struct {
-	Token string `json:"token,omitempty"`
-}
-
-type GetAccountResBody struct {
-	OK      bool                `json:"ok"`
-	Account *rediscache.Account `json:"account"`
-}
-
 func (s *Service) GetAccount(c *gin.Context) {
 	rid := c.DefaultQuery("rid", NewToken())
-	req := &GetAccountReqBody{
+	parm := &api.GetAccountReqParm{
 		Token: c.DefaultQuery("token", ""),
 	}
-	var res *GetAccountResBody
+	req := &api.GetAccountReqBody{}
+	var res *api.GetAccountResBody
 	var err error
 	var buf []byte
 	status := http.StatusOK
@@ -41,7 +33,7 @@ func (s *Service) GetAccount(c *gin.Context) {
 		}).Info()
 	}()
 
-	if err = s.checkGetAccountReqBody(req); err != nil {
+	if err = s.checkGetAccountReqBody(parm, req); err != nil {
 		err = fmt.Errorf("check request body failed. body: [%v], err: [%v]", string(buf), err)
 		WarnLog.WithField("@rid", rid).WithField("err", err).Warn()
 		status = http.StatusBadRequest
@@ -49,7 +41,7 @@ func (s *Service) GetAccount(c *gin.Context) {
 		return
 	}
 
-	res, err = s.getAccount(req)
+	res, err = s.getAccount(parm, req)
 	if err != nil {
 		WarnLog.WithField("@rid", rid).WithField("err", err).Warn("getAccount failed")
 		status = http.StatusInternalServerError
@@ -61,9 +53,9 @@ func (s *Service) GetAccount(c *gin.Context) {
 	c.JSON(status, res)
 }
 
-func (s *Service) checkGetAccountReqBody(req *GetAccountReqBody) error {
+func (s *Service) checkGetAccountReqBody(parm *api.GetAccountReqParm, req *api.GetAccountReqBody) error {
 	if err := rule.Check(map[interface{}][]rule.Rule{
-		req.Token: {rule.Required},
+		parm.Token: {rule.Required},
 	}); err != nil {
 		return err
 	}
@@ -71,17 +63,26 @@ func (s *Service) checkGetAccountReqBody(req *GetAccountReqBody) error {
 	return nil
 }
 
-func (s *Service) getAccount(req *GetAccountReqBody) (*GetAccountResBody, error) {
-	account, err := s.cache.GetAccount(req.Token)
+func (s *Service) getAccount(parm *api.GetAccountReqParm, req *api.GetAccountReqBody) (*api.GetAccountResBody, error) {
+	account, err := s.cache.GetAccount(parm.Token)
 	if err != nil {
 		return nil, err
 	}
 	if account == nil {
-		return &GetAccountResBody{OK: false}, nil
+		return &api.GetAccountResBody{OK: false}, nil
 	}
 
-	return &GetAccountResBody{
-		OK:      true,
-		Account: account,
+	return &api.GetAccountResBody{
+		OK: true,
+		Account: &api.Account{
+			ID:        account.ID,
+			Email:     account.Email,
+			Phone:     account.Phone,
+			FirstName: account.FirstName,
+			LastName:  account.LastName,
+			Birthday:  account.Birthday,
+			Password:  account.Password,
+			Gender:    account.Gender,
+		},
 	}, nil
 }

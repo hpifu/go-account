@@ -1,43 +1,27 @@
 package account
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/hpifu/go-account/internal/c"
 	"github.com/hpifu/go-account/internal/mysqldb"
 	"github.com/hpifu/go-account/internal/rule"
+	api "github.com/hpifu/go-account/pkg/account"
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"time"
 )
 
-type SignUpReqBody struct {
-	FirstName string   `json:"firstName,omitempty"`
-	LastName  string   `json:"lastName,omitempty"`
-	Phone     string   `json:"phone,omitempty"`
-	Email     string   `json:"email,omitempty"`
-	Password  string   `json:"password,omitempty"`
-	Birthday  string   `json:"birthday,omitempty"`
-	Gender    c.Gender `json:"gender,omitempty"`
-}
-
-type SignUpResBody struct {
-	Success bool `json:"success,omitempty"`
-}
-
 func (s *Service) SignUp(c *gin.Context) {
 	rid := c.DefaultQuery("rid", NewToken())
-	req := &SignUpReqBody{}
-	var res *SignUpResBody
+	req := &api.SignUpReqBody{}
+	var res *api.SignUpResBody
 	var err error
-	var buf []byte
 	status := http.StatusOK
 
 	defer func() {
 		AccessLog.WithFields(logrus.Fields{
 			"host":   c.Request.Host,
-			"body":   string(buf),
 			"url":    c.Request.URL.String(),
 			"req":    req,
 			"res":    res,
@@ -47,17 +31,8 @@ func (s *Service) SignUp(c *gin.Context) {
 		}).Info()
 	}()
 
-	buf, err = c.GetRawData()
-	if err != nil {
-		err = fmt.Errorf("get raw data failed, err: [%v]", err)
-		WarnLog.WithField("@rid", rid).WithField("err", err).Warn()
-		status = http.StatusBadRequest
-		c.String(status, err.Error())
-		return
-	}
-
-	if err = json.Unmarshal(buf, req); err != nil {
-		err = fmt.Errorf("json unmarshal body failed. body: [%v], err: [%v]", string(buf), err)
+	if err := c.BindJSON(req); err != nil {
+		err = fmt.Errorf("bind json failed. err: [%v]", err)
 		WarnLog.WithField("@rid", rid).WithField("err", err).Warn()
 		status = http.StatusBadRequest
 		c.String(status, err.Error())
@@ -65,7 +40,7 @@ func (s *Service) SignUp(c *gin.Context) {
 	}
 
 	if err = s.checkSignUpReqBody(req); err != nil {
-		err = fmt.Errorf("check request body failed. body: [%v], err: [%v]", string(buf), err)
+		err = fmt.Errorf("check request body failed. req: [%v], err: [%v]", req, err)
 		WarnLog.WithField("@rid", rid).WithField("err", err).Warn()
 		status = http.StatusBadRequest
 		c.String(status, err.Error())
@@ -85,7 +60,7 @@ func (s *Service) SignUp(c *gin.Context) {
 	c.JSON(status, res)
 }
 
-func (s *Service) checkSignUpReqBody(req *SignUpReqBody) error {
+func (s *Service) checkSignUpReqBody(req *api.SignUpReqBody) error {
 	if err := rule.Check(map[interface{}][]rule.Rule{
 		req.Password: {rule.Required, rule.AtLeast8Characters},
 		req.Birthday: {rule.Required, rule.ValidBirthday},
@@ -119,7 +94,7 @@ func (s *Service) checkSignUpReqBody(req *SignUpReqBody) error {
 	return nil
 }
 
-func (s *Service) signUp(req *SignUpReqBody) (*SignUpResBody, error) {
+func (s *Service) signUp(req *api.SignUpReqBody) (*api.SignUpResBody, error) {
 	birthday, _ := time.Parse("2006-01-02", req.Birthday)
 	ok, err := s.db.InsertAccount(&mysqldb.Account{
 		Phone:     req.Phone,
@@ -131,5 +106,5 @@ func (s *Service) signUp(req *SignUpReqBody) (*SignUpResBody, error) {
 		Gender:    req.Gender,
 	})
 
-	return &SignUpResBody{Success: ok}, err
+	return &api.SignUpResBody{Success: ok}, err
 }
