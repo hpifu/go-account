@@ -82,6 +82,7 @@ func (s *Service) getAccount(req *api.GetAccountReq) (*api.GetAccountRes, error)
 			Birthday:  account.Birthday,
 			Password:  account.Password,
 			Gender:    account.Gender,
+			Avatar:    account.Avatar,
 		},
 	}, nil
 }

@@ -64,7 +64,7 @@ func (s *Service) checkUpdateReqBody(req *api.UpdateReq) error {
 	if err := rule.Check(map[interface{}][]rule.Rule{
 		req.Token: {rule.Required},
 		req.Field: {rule.Required, rule.In(map[interface{}]struct{}{
-			"phone": {}, "email": {}, "name": {}, "birthday": {}, "gender": {}, "password": {},
+			"phone": {}, "email": {}, "name": {}, "birthday": {}, "gender": {}, "password": {}, "avatar": {},
 		})},
 	}); err != nil {
 		return err
@@ -144,6 +144,9 @@ func (s *Service) update(req *api.UpdateReq) (*api.UpdateRes, error) {
 		birthday, _ := time.Parse("2006-01-02", req.Birthday)
 		ok, err = s.db.UpdateAccountBirthday(account.ID, birthday)
 		account.Birthday = req.Birthday
+	case "avatar":
+		ok, err = s.db.UpdateAccountAvatar(account.ID, req.Avatar)
+		account.Avatar = req.Avatar
 	default:
 		return &api.UpdateRes{OK: false, Err: fmt.Sprintf("未知字段 [%v]", req.Field)}, nil
 	}

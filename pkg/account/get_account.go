@@ -13,6 +13,7 @@ type Account struct {
 	Birthday  string   `json:"birthday,omitempty"`
 	Password  string   `json:"password,omitempty"`
 	Gender    c.Gender `json:"gender"`
+	Avatar    string   `json:"avatar"`
 }
 
 type GetAccountReq struct {
