@@ -13,6 +13,7 @@ type UpdateReq struct {
 	Password    string   `json:"password,omitempty" http:"body"`
 	OldPassword string   `json:"oldPassword,omitempty" http:"body"`
 	Gender      c.Gender `json:"gender,omitempty" http:"body"`
+	Avatar      string   `json:"avatar,omitempty" http:"body"`
 }
 
 type UpdateRes struct {

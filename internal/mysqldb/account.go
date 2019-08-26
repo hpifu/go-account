@@ -18,6 +18,7 @@ type Account struct {
 	Password  string    `gorm:"type:varchar(32);not null" json:"password"`
 	Birthday  time.Time `gorm:"type:timestamp;not null" json:"birthday"`
 	Gender    c.Gender  `gorm:"type:int(1);not null" json:"gender"`
+	Avatar    string    `gorm:"type:varchar(512);" json:"avatar"`
 	Role      int       `gorm:"type:bigint(20) default 0;not null" json:"role"`
 }
 
@@ -130,6 +131,17 @@ func (m *MysqlDB) UpdateAccountPassword(id int, password string) (bool, error) {
 
 func (m *MysqlDB) UpdateAccountGender(id int, gender c.Gender) (bool, error) {
 	if err := m.db.Model(&Account{}).Where("id=?", id).Update("gender", gender).Error; err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+func (m *MysqlDB) UpdateAccountAvatar(id int, avatar string) (bool, error) {
+	account := &Account{
+		ID:     id,
+		Avatar: avatar,
+	}
+	if err := m.db.Model(account).Where("id=?", account.ID).Update(account).Error; err != nil {
 		return false, err
 	}
 	return true, nil

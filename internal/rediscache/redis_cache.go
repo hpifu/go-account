@@ -2,10 +2,10 @@ package rediscache
 
 import (
 	"encoding/json"
-	"github.com/hpifu/go-account/internal/c"
-	"time"
 	"github.com/go-redis/redis"
+	"github.com/hpifu/go-account/internal/c"
 	"github.com/hpifu/go-account/internal/mysqldb"
+	"time"
 )
 
 type Option struct {
@@ -33,6 +33,7 @@ type Account struct {
 	Birthday  string   `json:"birthday,omitempty"`
 	Password  string   `json:"password,omitempty"`
 	Gender    c.Gender `json:"gender"`
+	Avatar    string   `json:"avatar,omitempty"`
 }
 
 func NewAccount(account *mysqldb.Account) *Account {
@@ -45,6 +46,7 @@ func NewAccount(account *mysqldb.Account) *Account {
 		Password:  account.Password,
 		Birthday:  account.Birthday.Format("2006-01-02"),
 		Gender:    account.Gender,
+		Avatar:    account.Avatar,
 	}
 }
 

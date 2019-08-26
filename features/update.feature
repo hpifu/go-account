@@ -76,7 +76,6 @@ Feature: update 登陆测试
             | 11112222 | 12345678    | 11112222    | 200    | true  | N/A      |
             | 11112222 | 12341234    | 12345678    | 200    | false | 密码错误 |
 
-
     Scenario Outline: update name 异常
         Given mysqldb.accounts 创建用户, phone: "13112345678", email: "hatlonely1@foxmail.com", password: "12345678", firstname: "孙", lastname: "悟空", birthday: "1992-01-01", gender: 1
         When 请求 /signin, username: "13112345678", password: "12345678"

@@ -99,6 +99,10 @@ func (s *Service) checkUpdateReqBody(req *api.UpdateReq) error {
 			req.Password:    {rule.Required, rule.AtLeast8Characters},
 			req.OldPassword: {rule.Required, rule.AtLeast8Characters},
 		})
+	case "avatar":
+		return rule.Check(map[interface{}][]rule.Rule{
+			req.Avatar: {rule.Required},
+		})
 	default:
 		return fmt.Errorf("未知字段 [%v]", req.Field)
 	}
