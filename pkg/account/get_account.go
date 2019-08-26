@@ -16,7 +16,7 @@ type Account struct {
 }
 
 type GetAccountReq struct {
-	Token string `json:"token,omitempty"`
+	Token string `json:"token,omitempty" http:"param"`
 }
 
 type GetAccountRes struct {

@@ -1,7 +1,6 @@
 package account
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/hpifu/go-account/internal/mail"
@@ -32,17 +31,8 @@ func (s *Service) GenAuthCode(c *gin.Context) {
 		}).Info()
 	}()
 
-	buf, err = c.GetRawData()
-	if err != nil {
-		err = fmt.Errorf("get raw data failed, err: [%v]", err)
-		WarnLog.WithField("@rid", rid).WithField("err", err).Warn()
-		status = http.StatusBadRequest
-		c.String(status, err.Error())
-		return
-	}
-
-	if err = json.Unmarshal(buf, req); err != nil {
-		err = fmt.Errorf("json unmarshal body failed. body: [%v], err: [%v]", string(buf), err)
+	if err := c.BindJSON(req); err != nil {
+		err = fmt.Errorf("bind json failed. err: [%v]", err)
 		WarnLog.WithField("@rid", rid).WithField("err", err).Warn()
 		status = http.StatusBadRequest
 		c.String(status, err.Error())
