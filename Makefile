@@ -27,14 +27,14 @@ push:
 
 .PHONY: buildenv
 buildenv:
-	docker run --rm --name go-build-env -d golang:1.12.5 tail -f /dev/null
+	docker run --name go-build-env -d golang:1.12.5 tail -f /dev/null
 
 .PHONY: image
 image:
-	docker exec -it go-build-env rm -rf /data/src/hpifu/account
-	docker exec -it go-build-env mkdir -p /data/src/hpifu/account
+	docker exec -i go-build-env rm -rf /data/src/hpifu/account
+	docker exec -i go-build-env mkdir -p /data/src/hpifu/account
 	docker cp . go-build-env:/data/src/hpifu/account
-	docker exec -it go-build-env bash -c "cd /data/src/hpifu/account && make output"
+	docker exec -i go-build-env bash -c "cd /data/src/hpifu/account && make output"
 	mkdir -p docker/
 	docker cp go-build-env:/data/src/hpifu/account/output/account docker/
 	docker build --tag=hatlonely/account:`git describe --tags` .
