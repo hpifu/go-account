@@ -4,8 +4,6 @@ pipeline {
         stage('behave') {
             steps {
                 sh 'pwd'
-                sh 'pwd'
-                sh 'make behave'
             }
         }
         stage('image') {
