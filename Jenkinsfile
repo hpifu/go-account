@@ -3,6 +3,7 @@ pipeline {
     stages {
         stage('behave') {
             steps {
+                sh 'pwd'
                 sh 'make behave'
             }
         }
