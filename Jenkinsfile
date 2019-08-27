@@ -1,9 +1,19 @@
 pipeline {
     agent any
     stages {
-        stage('build') {
+        stage('behave') {
             steps {
-                make output
+                sh 'make behave'
+            }
+        }
+        stage('image') {
+            steps {
+                sh 'make image'
+            }
+        }
+        stage('deploy') {
+            steps {
+                sh 'make deploy'
             }
         }
     }
