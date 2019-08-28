@@ -47,12 +47,12 @@ testenv:
 
 .PHONY: image
 image:
-	docker exec -i go-build-env rm -rf /data/src/hpifu/account
-	docker exec -i go-build-env mkdir -p /data/src/hpifu/account
-	docker cp . go-build-env:/data/src/hpifu/account
-	docker exec -i go-build-env bash -c "cd /data/src/hpifu/account && make output"
+	docker exec -i go-test-env rm -rf /data/src/hpifu/account
+	docker exec -i go-test-env mkdir -p /data/src/hpifu/account
+	docker cp . go-test-env:/data/src/hpifu/account
+	docker exec -i go-test-env bash -c "cd /data/src/hpifu/account && make output"
 	mkdir -p docker/
-	docker cp go-build-env:/data/src/hpifu/account/output/account docker/
+	docker cp go-test-env:/data/src/hpifu/account/output/account docker/
 	docker build --tag=hatlonely/account:${version} .
 	${sedi} 's/image: ${user}\/${repository}:.*$$/image: ${user}\/${repository}:${version}/g' stack.yml
 

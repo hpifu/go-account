@@ -1,4 +1,5 @@
-FROM golang:1.12.5
+# FROM golang:1.12.5
+FROM centos:centos7
 COPY docker/account /var/docker/account
 RUN mkdir -p /var/docker/account/log
 EXPOSE 6060
