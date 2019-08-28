@@ -3,7 +3,6 @@ pipeline {
     stages {
         stage('unit') {
             steps {
-                sh 'pwd'
                 sh 'make dockertest'
             }
         }
