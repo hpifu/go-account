@@ -1,6 +1,6 @@
 repository=account
 user=hatlonely
-version=$(shell git describe --tags | awk -F "-" '{print $1}')
+version=$(shell git describe --tags | awk -F "-" '{print $$1}')
 
 export GOPATH=$(shell pwd)/../../../../
 export PATH:=${PATH}:${GOPATH}/bin:$(shell pwd)/third/go/bin:$(shell pwd)/third/protobuf/bin:$(shell pwd)/third/cloc-1.76:$(shell pwd)/third/redis-3.2.8/src
@@ -15,19 +15,35 @@ endif
 .PHONY: all
 all: third vendor output test stat
 
+.PHONY: deploy
 deploy:
 	mkdir -p /var/docker/${repository}/log
 	docker stack deploy -c stack.yml ${repository}
 
+.PHONY: remove
 remove:
 	docker stack rm ${repository}
 
+.PHONY: push
 push:
 	docker push ${user}/${repository}:${version}
 
 .PHONY: buildenv
 buildenv:
 	docker run --name go-build-env -d golang:1.12.5 tail -f /dev/null
+
+.PHONY: dockertest
+testenv:
+	# docker stop test-redis
+	# docker stop test-mysql
+	# docker stop go-test-env
+	# docker rm test-redis
+	# docker rm test-mysql
+	# docker rm go-test-env
+	docker network create -d bridge testnet
+	docker run --name test-redis --hostname test-redis --network testnet -d redis:5.0.5-alpine
+	docker run --name test-mysql --hostname test-mysql --network testnet -e MYSQL_ROOT_PASSWORD=keaiduo1 -d hatlonely/mysql:1.0.0
+	docker run --name go-test-env --network testnet -d golang:1.12.5 tail -f /dev/null
 
 .PHONY: image
 image:
@@ -37,8 +53,22 @@ image:
 	docker exec -i go-build-env bash -c "cd /data/src/hpifu/account && make output"
 	mkdir -p docker/
 	docker cp go-build-env:/data/src/hpifu/account/output/account docker/
-	docker build --tag=hatlonely/account:`git describe --tags` .
+	docker build --tag=hatlonely/account:${version} .
 	${sedi} 's/image: ${user}\/${repository}:.*$$/image: ${user}\/${repository}:${version}/g' stack.yml
+
+.PHONY: dockertest
+dockertest:
+	docker exec -i go-test-env rm -rf /data/src/hpifu/account
+	docker exec -i go-test-env mkdir -p /data/src/hpifu/account
+	docker cp . go-test-env:/data/src/hpifu/account
+	docker exec -i go-test-env bash -c "cd /data/src/hpifu/account && make test"
+
+.PHONY: dockerbehave
+dockerbehave:
+	docker exec -i go-test-env rm -rf /data/src/hpifu/account
+	docker exec -i go-test-env mkdir -p /data/src/hpifu/account
+	docker cp . go-test-env:/data/src/hpifu/account
+	docker exec -i go-test-env bash -c "cd /data/src/hpifu/account && make behave"
 
 output: cmd/*/*.go internal/*/*.go scripts/version.sh Makefile vendor
 	@echo "compile"

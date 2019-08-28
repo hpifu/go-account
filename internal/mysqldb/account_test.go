@@ -8,7 +8,7 @@ import (
 )
 
 func TestMysqlDB_InsertAccount(t *testing.T) {
-	m, err := NewMysqlDB("hatlonely:keaiduo1@/hads?charset=utf8&parseTime=True&loc=Local")
+	m, err := NewMysqlDB("hatlonely:keaiduo1@tcp(test-mysql:3306)/hads?charset=utf8&parseTime=True&loc=Local")
 	Convey("test mysqldb insert account", t, func() {
 		So(err, ShouldBeNil)
 		So(m, ShouldNotBeNil)
@@ -72,7 +72,7 @@ func TestMysqlDB_InsertAccount(t *testing.T) {
 }
 
 func TestMysqlDB_SelectAccountByUsernameOrTelephoneOrEmail(t *testing.T) {
-	m, err := NewMysqlDB("hatlonely:keaiduo1@/hads?charset=utf8&parseTime=True&loc=Local")
+	m, err := NewMysqlDB("hatlonely:keaiduo1@tcp(test-mysql:3306)/hads?charset=utf8&parseTime=True&loc=Local")
 	Convey("test mysqldb select account by username or phone or email", t, func() {
 		So(err, ShouldBeNil)
 		So(m, ShouldNotBeNil)
@@ -132,7 +132,7 @@ func TestMysqlDB_SelectAccountByUsernameOrTelephoneOrEmail(t *testing.T) {
 }
 
 func TestMysqlDB_UpdateAccount(t *testing.T) {
-	m, err := NewMysqlDB("hatlonely:keaiduo1@/hads?charset=utf8&parseTime=True&loc=Local")
+	m, err := NewMysqlDB("hatlonely:keaiduo1@tcp(test-mysql:3306)/hads?charset=utf8&parseTime=True&loc=Local")
 	Convey("test mysqldb update account", t, func() {
 		So(err, ShouldBeNil)
 		So(m, ShouldNotBeNil)

@@ -1,14 +1,15 @@
 package rediscache
 
 import (
-	. "github.com/smartystreets/goconvey/convey"
 	"testing"
 	"time"
+
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestRedisCache_SetGetDelAccount(t *testing.T) {
 	rc, err := NewRedisCache(&Option{
-		Address:         "127.0.0.1:6379",
+		Address:         "test-redis:6379",
 		Timeout:         20 * time.Millisecond,
 		Retries:         3,
 		PoolSize:        20,
