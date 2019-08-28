@@ -1,6 +1,6 @@
 repository=account
 user=hatlonely
-version=$(shell git describe --tags)
+version=$(shell git describe --tags | awk -F "-" '{print $1}')
 
 export GOPATH=$(shell pwd)/../../../../
 export PATH:=${PATH}:${GOPATH}/bin:$(shell pwd)/third/go/bin:$(shell pwd)/third/protobuf/bin:$(shell pwd)/third/cloc-1.76:$(shell pwd)/third/redis-3.2.8/src
