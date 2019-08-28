@@ -43,7 +43,7 @@ testenv:
 	docker network create -d bridge testnet
 	docker run --name test-redis --hostname test-redis --network testnet -d redis:5.0.5-alpine
 	docker run --name test-mysql --hostname test-mysql --network testnet -e MYSQL_ROOT_PASSWORD=keaiduo1 -d hatlonely/mysql:1.0.0
-	docker run --name go-test-env --network testnet -d golang:1.12.5 tail -f /dev/null
+	docker run --name go-test-env --network testnet -d hatlonely/go-env:1.0.0 tail -f /dev/null
 
 .PHONY: image
 image:
