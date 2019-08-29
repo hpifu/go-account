@@ -1,8 +1,8 @@
 version: "3.5"
 services:
-  account:
+  go-account:
     image: hatlonely/go-account:v1.4.0
-    hostname: account
+    hostname: go-account
     deploy:
       replicas: 1
       restart_policy:
@@ -12,12 +12,12 @@ services:
     # volumes:
     #   - "/var/docker/account/log:/var/docker/account/log"
     networks:
-      - accountnet
+      - go-accountnet
       - mysqlnet
       - redisnet
 networks:
-  accountnet:
-    name: accountnet
+  go-accountnet:
+    name: go-accountnet
   redisnet:
     external: true
     name: redisnet
