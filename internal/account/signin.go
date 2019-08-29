@@ -57,7 +57,7 @@ func (s *Service) SignIn(c *gin.Context) {
 
 	if res.Valid {
 		// 最后一个参数是 httponly 需要设置成 false 否则 axios 不能访问到 cookie
-		c.SetCookie("token", res.Token, 7*24*3600, "/", "127.0.0.1", true, false)
+		c.SetCookie("token", res.Token, 7*24*3600, "/", "account.hatlonely.com", true, false)
 	}
 
 	status = http.StatusOK
