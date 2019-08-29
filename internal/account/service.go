@@ -22,16 +22,26 @@ func init() {
 }
 
 type Service struct {
-	db    *mysqldb.MysqlDB
-	cache *rediscache.RedisCache
-	mc    *mail.MailClient
+	db     *mysqldb.MysqlDB
+	cache  *rediscache.RedisCache
+	mc     *mail.MailClient
+	secure bool
+	domain string
 }
 
-func NewService(db *mysqldb.MysqlDB, cache *rediscache.RedisCache, mc *mail.MailClient) *Service {
+func NewService(
+	db *mysqldb.MysqlDB,
+	cache *rediscache.RedisCache,
+	mc *mail.MailClient,
+	secure bool,
+	domain string,
+) *Service {
 	return &Service{
-		db:    db,
-		cache: cache,
-		mc:    mc,
+		db:     db,
+		cache:  cache,
+		mc:     mc,
+		secure: secure,
+		domain: domain,
 	}
 }
 

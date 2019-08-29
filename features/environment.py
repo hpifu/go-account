@@ -17,8 +17,12 @@ register_type(bool=lambda x: True if x == "true" else False)
 
 
 config = {
-    "port": 16060,
     "prefix": "output/account",
+    "service": {
+        "port": 16060,
+        "secure": False,
+        "domain": "127.0.0.1"
+    },
     "mysqldb": {
         "host": "test-mysql",
         "port": 3306,
@@ -62,7 +66,9 @@ def deploy():
         host=config["redis"]["host"],
         port=config["redis"]["port"],
     )
-    cf["service"]["port"] = ":{}".format(config["port"])
+    cf["service"]["port"] = ":{}".format(config["service"]["port"])
+    cf["service"]["secure"] = config["service"]["secure"]
+    cf["service"]["domain"] = config["service"]["domain"]
     fp = open("{}/configs/account.json".format(config["prefix"]), "w")
     fp.write(json.dumps(cf, indent=4))
     fp.close()
@@ -73,7 +79,7 @@ def start():
         "cd {} && nohup bin/account &".format(config["prefix"]),  shell=True
     )
 
-    wait_for_port(config["port"], timeout=5)
+    wait_for_port(config["service"]["port"], timeout=5)
 
 
 def stop():
@@ -83,7 +89,7 @@ def stop():
 
 
 def before_all(context):
-    config["url"] = "http://127.0.0.1:{}".format(config["port"])
+    config["url"] = "http://127.0.0.1:{}".format(config["service"]["port"])
     context.mysql_conn = pymysql.connect(
         host=config["mysqldb"]["host"],
         user=config["mysqldb"]["user"],
