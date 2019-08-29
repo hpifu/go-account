@@ -1,5 +1,7 @@
-repository=account
-user=hatlonely
+binary=account
+dockeruser=hatlonely
+gituser=hpifu
+repository=go-account
 version=$(shell git describe --tags)
 
 export GOPATH=$(shell pwd)/../../../../
@@ -17,16 +19,15 @@ all: third vendor output test stat
 
 .PHONY: deploy
 deploy:
-	mkdir -p /var/docker/${repository}/log
-	docker stack deploy -c stack.yml ${repository}
+	docker stack deploy -c stack.yml ${binary}
 
 .PHONY: remove
 remove:
-	docker stack rm ${repository}
+	docker stack rm ${binary}
 
 .PHONY: push
 push:
-	docker push ${user}/${repository}:${version}
+	docker push ${dockeruser}/${binary}:${version}
 
 .PHONY: buildenv
 buildenv:
@@ -60,35 +61,35 @@ cleanbuildenv:
 
 .PHONY: image
 image: buildenv
-	docker exec -i go-build-env rm -rf /data/src/hpifu/account
-	docker exec -i go-build-env mkdir -p /data/src/hpifu/account
-	docker cp . go-build-env:/data/src/hpifu/account
-	docker exec -i go-build-env bash -c "cd /data/src/hpifu/account && make output"
+	docker exec -i go-build-env rm -rf /data/src/${gituser}/${repository}
+	docker exec -i go-build-env mkdir -p /data/src/${gituser}/${repository}
+	docker cp . go-build-env:/data/src/${gituser}/${repository}
+	docker exec -i go-build-env bash -c "cd /data/src/${gituser}/${repository} && make output"
 	mkdir -p docker/
-	docker cp go-build-env:/data/src/hpifu/account/output/account docker/
-	docker build --tag=hatlonely/account:${version} .
-	${sedi} 's/image: ${user}\/${repository}:.*$$/image: ${user}\/${repository}:${version}/g' stack.yml
+	docker cp go-build-env:/data/src/${gituser}/${repository}/output/${binary} docker/
+	docker build --tag=hatlonely/${repository}:${version} .
+	${sedi} 's/image: ${dockeruser}\/${repository}:.*$$/image: ${dockeruser}\/${repository}:${version}/g' stack.yml
 
 .PHONY: dockertest
 dockertest: buildenv
-	docker exec -i go-build-env rm -rf /data/src/hpifu/account
-	docker exec -i go-build-env mkdir -p /data/src/hpifu/account
-	docker cp . go-build-env:/data/src/hpifu/account
-	docker exec -i go-build-env bash -c "cd /data/src/hpifu/account && make test"
+	docker exec -i go-build-env rm -rf /data/src/${gituser}/${repository}
+	docker exec -i go-build-env mkdir -p /data/src/${gituser}/${repository}
+	docker cp . go-build-env:/data/src/${gituser}/${repository}
+	docker exec -i go-build-env bash -c "cd /data/src/${gituser}/${repository} && make test"
 
 .PHONY: dockerbehave
 dockerbehave: buildenv
-	docker exec -i go-build-env rm -rf /data/src/hpifu/account
-	docker exec -i go-build-env mkdir -p /data/src/hpifu/account
-	docker cp . go-build-env:/data/src/hpifu/account
-	docker exec -i go-build-env bash -c "cd /data/src/hpifu/account && make behave"
+	docker exec -i go-build-env rm -rf /data/src/${gituser}/${repository}
+	docker exec -i go-build-env mkdir -p /data/src/${gituser}/${repository}
+	docker cp . go-build-env:/data/src/${gituser}/${repository}
+	docker exec -i go-build-env bash -c "cd /data/src/${gituser}/${repository} && make behave"
 
 output: cmd/*/*.go internal/*/*.go scripts/version.sh Makefile vendor
 	@echo "compile"
-	@go build -ldflags "-X 'main.AppVersion=`sh scripts/version.sh`'" cmd/account/main.go && \
-	mkdir -p output/account/bin && mv main output/account/bin/account && \
-	mkdir -p output/account/configs && cp configs/account/* output/account/configs && \
-	mkdir -p output/account/log
+	@go build -ldflags "-X 'main.AppVersion=`sh scripts/version.sh`'" cmd/${binary}/main.go && \
+	mkdir -p output/${binary}/bin && mv main output/${binary}/bin/${binary} && \
+	mkdir -p output/${binary}/configs && cp configs/${binary}/* output/${binary}/configs && \
+	mkdir -p output/${binary}/log
 
 vendor: go.mod go.sum
 	@echo "install golang dependency"
