@@ -30,45 +30,58 @@ push:
 
 .PHONY: buildenv
 buildenv:
-	docker run --name go-build-env -d golang:1.12.5 tail -f /dev/null
+	if [ -z "$(shell docker network ls --filter name=testnet -q)" ]; then \
+		docker network create -d bridge testnet; \
+	fi
+	if [ -z "$(shell docker ps --filter name=test-redis -q)" ]; then \
+		docker run --name test-redis --hostname test-redis --network testnet -d redis:5.0.5-alpine; \
+	fi
+	if [ -z "$(shell docker ps --filter name=test-mysql -q)" ]; then \
+		docker run --name test-mysql --hostname test-mysql --network testnet -e MYSQL_ROOT_PASSWORD=keaiduo1 -d hatlonely/mysql:1.0.0; \
+	fi
+	if [ -z "$(shell docker ps --filter name=go-build-env -q)" ]; then \
+		docker run --name go-build-env --network testnet -d hatlonely/go-env:1.0.0 tail -f /dev/null; \
+	fi
 
-.PHONY: dockertest
-testenv:
-	# docker stop test-redis
-	# docker stop test-mysql
-	# docker stop go-test-env
-	# docker rm test-redis
-	# docker rm test-mysql
-	# docker rm go-test-env
-	docker network create -d bridge testnet
-	docker run --name test-redis --hostname test-redis --network testnet -d redis:5.0.5-alpine
-	docker run --name test-mysql --hostname test-mysql --network testnet -e MYSQL_ROOT_PASSWORD=keaiduo1 -d hatlonely/mysql:1.0.0
-	docker run --name go-test-env --network testnet -d hatlonely/go-env:1.0.0 tail -f /dev/null
+.PHONY: cleanbuildenv
+cleanbuildenv:
+	if [ ! -z "$(shell docker ps --filter name=go-build-env -q)" ]; then \
+		docker stop go-build-env  && docker rm go-build-env; \
+	fi
+	if [ ! -z "$(shell docker ps --filter name=test-redis -q)" ]; then \
+		docker stop test-redis && docker rm test-redis; \
+	fi
+	if [ ! -z "$(shell docker ps --filter name=test-mysql -q)" ]; then \
+		docker stop test-mysql && docker rm test-mysql; \
+	fi
+	if [ ! -z "$(shell docker network ls --filter name=testnet -q)" ]; then \
+		docker network rm testnet; \
+	fi
 
 .PHONY: image
-image:
-	docker exec -i go-test-env rm -rf /data/src/hpifu/account
-	docker exec -i go-test-env mkdir -p /data/src/hpifu/account
-	docker cp . go-test-env:/data/src/hpifu/account
-	docker exec -i go-test-env bash -c "cd /data/src/hpifu/account && make output"
+image: buildenv
+	docker exec -i go-build-env rm -rf /data/src/hpifu/account
+	docker exec -i go-build-env mkdir -p /data/src/hpifu/account
+	docker cp . go-build-env:/data/src/hpifu/account
+	docker exec -i go-build-env bash -c "cd /data/src/hpifu/account && make output"
 	mkdir -p docker/
-	docker cp go-test-env:/data/src/hpifu/account/output/account docker/
+	docker cp go-build-env:/data/src/hpifu/account/output/account docker/
 	docker build --tag=hatlonely/account:${version} .
 	${sedi} 's/image: ${user}\/${repository}:.*$$/image: ${user}\/${repository}:${version}/g' stack.yml
 
 .PHONY: dockertest
-dockertest:
-	docker exec -i go-test-env rm -rf /data/src/hpifu/account
-	docker exec -i go-test-env mkdir -p /data/src/hpifu/account
-	docker cp . go-test-env:/data/src/hpifu/account
-	docker exec -i go-test-env bash -c "cd /data/src/hpifu/account && make test"
+dockertest: buildenv
+	docker exec -i go-build-env rm -rf /data/src/hpifu/account
+	docker exec -i go-build-env mkdir -p /data/src/hpifu/account
+	docker cp . go-build-env:/data/src/hpifu/account
+	docker exec -i go-build-env bash -c "cd /data/src/hpifu/account && make test"
 
 .PHONY: dockerbehave
-dockerbehave:
-	docker exec -i go-test-env rm -rf /data/src/hpifu/account
-	docker exec -i go-test-env mkdir -p /data/src/hpifu/account
-	docker cp . go-test-env:/data/src/hpifu/account
-	docker exec -i go-test-env bash -c "cd /data/src/hpifu/account && make behave"
+dockerbehave: buildenv
+	docker exec -i go-build-env rm -rf /data/src/hpifu/account
+	docker exec -i go-build-env mkdir -p /data/src/hpifu/account
+	docker cp . go-build-env:/data/src/hpifu/account
+	docker exec -i go-build-env bash -c "cd /data/src/hpifu/account && make behave"
 
 output: cmd/*/*.go internal/*/*.go scripts/version.sh Makefile vendor
 	@echo "compile"
