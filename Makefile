@@ -19,15 +19,15 @@ all: third vendor output test stat
 
 .PHONY: deploy
 deploy:
-	docker stack deploy -c stack.yml ${binary}
+	docker stack deploy -c stack.yml ${repository}
 
 .PHONY: remove
 remove:
-	docker stack rm ${binary}
+	docker stack rm ${repository}
 
 .PHONY: push
 push:
-	docker push ${dockeruser}/${binary}:${version}
+	docker push ${dockeruser}/${repository}:${version}
 
 .PHONY: buildenv
 buildenv:
