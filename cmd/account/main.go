@@ -66,9 +66,15 @@ func main() {
 	infoLog.Infof("init mysqldb success. uri [%v]", config.GetString("mysqldb.uri"))
 
 	// init redis cache
-	option := &rediscache.Option{}
-	if err := config.Sub("rediscache").Unmarshal(option); err != nil {
-		panic(err)
+	option := &rediscache.Option{
+		Address:            config.GetString("rediscache.address"),
+		Timeout:            config.GetDuration("rediscache.timeout"),
+		Retries:            config.GetInt("rediscache.retries"),
+		PoolSize:           config.GetInt("rediscache.poolSize"),
+		Password:           config.GetString("rediscache.password"),
+		DB:                 config.GetInt("rediscache.0"),
+		TokenExpiration:    config.GetDuration("rediscache.tokenExpiration"),
+		AuthCodeExpiration: config.GetDuration("rediscache.authCodeExpiration"),
 	}
 	cache, err := rediscache.NewRedisCache(option)
 	if err != nil {

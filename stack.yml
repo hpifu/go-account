@@ -1,7 +1,7 @@
 version: "3.5"
 services:
   go-account:
-    image: hatlonely/go-account:v1.4.1
+    image: hatlonely/go-account:v1.4.2
     hostname: go-account
     deploy:
       replicas: 1
