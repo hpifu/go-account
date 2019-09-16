@@ -20,8 +20,9 @@ config = {
     "prefix": "output/account",
     "service": {
         "port": 16060,
-        "secure": False,
-        "domain": "127.0.0.1"
+        "cookieSecure": False,
+        "allowOrigin": "http://127.0.0.1:4000",
+        "cookieDomain": "127.0.0.1"
     },
     "mysqldb": {
         "host": "test-mysql",
@@ -67,8 +68,9 @@ def deploy():
         port=config["redis"]["port"],
     )
     cf["service"]["port"] = ":{}".format(config["service"]["port"])
-    cf["service"]["secure"] = config["service"]["secure"]
-    cf["service"]["domain"] = config["service"]["domain"]
+    cf["service"]["cookieSecure"] = config["service"]["cookieSecure"]
+    cf["service"]["cookieDomain"] = config["service"]["cookieDomain"]
+    cf["service"]["allowOrigin"] = config["service"]["allowOrigin"]
     fp = open("{}/configs/account.json".format(config["prefix"]), "w")
     fp.write(json.dumps(cf, indent=4))
     fp.close()

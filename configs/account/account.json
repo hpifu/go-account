@@ -1,8 +1,9 @@
 {
     "service": {
         "port": ":6060",
-        "secure": true,
-        "domain": "account.hatlonely.com"
+        "allowOrigin": "https://account.hatlonely.com",
+        "cookieSecure": true,
+        "cookieDomain": "account.hatlonely.com"
     },
     "mysqldb": {
         "uri": "hatlonely:keaiduo1@tcp(mysql:3306)/hads?charset=utf8&parseTime=True&loc=Local"
