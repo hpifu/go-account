@@ -22,7 +22,7 @@ type Account struct {
 }
 
 type GETAccountV2Req struct {
-	Token string `uri:"token" json:"token,omitempty" `
+	Token string `uri:"token" json:"token,omitempty"`
 }
 
 func (s *Service) GETAccountV2(c *gin.Context) {

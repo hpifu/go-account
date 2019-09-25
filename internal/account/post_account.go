@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func (s *Service) PUTAccount(c *gin.Context) {
+func (s *Service) POSTAccount(c *gin.Context) {
 	rid := c.DefaultQuery("rid", NewToken())
 	req := &Account{}
 	var err error
@@ -37,7 +37,7 @@ func (s *Service) PUTAccount(c *gin.Context) {
 		return
 	}
 
-	if err = s.checkPUTAccountReqBody(req); err != nil {
+	if err = s.checkPOSTAccountReqBody(req); err != nil {
 		err = fmt.Errorf("check request body failed. req: [%v], err: [%v]", req, err)
 		WarnLog.WithField("@rid", rid).WithField("err", err).Warn()
 		status = http.StatusBadRequest
@@ -45,9 +45,9 @@ func (s *Service) PUTAccount(c *gin.Context) {
 		return
 	}
 
-	ok, err := s.putAccount(req)
+	ok, err := s.postAccount(req)
 	if err != nil {
-		err = fmt.Errorf("putAccount failed. err: [%v]", err)
+		err = fmt.Errorf("postAccount failed. err: [%v]", err)
 		WarnLog.WithField("@rid", rid).WithField("err", err).Warn()
 		status = http.StatusInternalServerError
 		c.String(status, err.Error())
@@ -62,7 +62,7 @@ func (s *Service) PUTAccount(c *gin.Context) {
 	c.Status(status)
 }
 
-func (s *Service) checkPUTAccountReqBody(req *Account) error {
+func (s *Service) checkPOSTAccountReqBody(req *Account) error {
 	if err := rule.Check(map[interface{}][]rule.Rule{
 		req.Password: {rule.Required, rule.AtLeast8Characters},
 		req.Gender: {rule.In(map[interface{}]struct{}{
@@ -111,7 +111,7 @@ func (s *Service) checkPUTAccountReqBody(req *Account) error {
 	return nil
 }
 
-func (s *Service) putAccount(req *Account) (bool, error) {
+func (s *Service) postAccount(req *Account) (bool, error) {
 	birthday, _ := time.Parse("2006-01-02", req.Birthday)
 	ok, err := s.db.InsertAccount(&mysqldb.Account{
 		Phone:     req.Phone,
