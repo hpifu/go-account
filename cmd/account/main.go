@@ -125,6 +125,8 @@ func main() {
 	r.POST("/update", service.Update)
 	r.POST("/signin", service.SignIn)
 	r.POST("/signup", service.SignUp)
+	r.GET("/account/:token", service.GETAccountV2)
+	r.PUT("/account", service.PUTAccount)
 
 	infoLog.Infof("%v init success, port [%v]", os.Args[0], config.GetString("service.port"))
 

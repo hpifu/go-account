@@ -13,11 +13,11 @@ type Account struct {
 	ID        int       `gorm:"type:bigint(20) auto_increment;primary_key" json:"id"`
 	Email     string    `gorm:"type:varchar(64);index:email_idx" json:"email"`
 	Phone     string    `gorm:"type:varchar(64);index:phone_idx" json:"phone"`
-	FirstName string    `gorm:"type:varchar(32);not null" json:"firstName"`
-	LastName  string    `gorm:"type:varchar(32);not null" json:"lastName"`
-	Password  string    `gorm:"type:varchar(32);not null" json:"password"`
-	Birthday  time.Time `gorm:"type:timestamp;not null" json:"birthday"`
-	Gender    c.Gender  `gorm:"type:int(1);not null" json:"gender"`
+	FirstName string    `gorm:"type:varchar(32);" json:"firstName"`
+	LastName  string    `gorm:"type:varchar(32);" json:"lastName"`
+	Password  string    `gorm:"type:varchar(32);" json:"password"`
+	Birthday  time.Time `gorm:"type:timestamp default '1970-01-02 00:00:00'" json:"birthday"`
+	Gender    c.Gender  `gorm:"type:int(1);" json:"gender"`
 	Avatar    string    `gorm:"type:varchar(512);" json:"avatar"`
 	Role      int       `gorm:"type:bigint(20) default 0;not null" json:"role"`
 }
