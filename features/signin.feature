@@ -39,6 +39,7 @@ Feature: POST /signin
         Then http 检查 200
             """
             {
+                "text": "",
                 "cookies": {
                     "token": "exist"
                 }
@@ -53,7 +54,12 @@ Feature: POST /signin
                 }
             }
             """
-        Then http 检查 403
+        Then http 检查 200
+            """
+            {
+                "text": "密码错误"
+            }
+            """
         Given mysql 执行
             """
             DELETE FROM accounts WHERE id=1

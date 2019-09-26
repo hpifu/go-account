@@ -64,10 +64,12 @@ func (s *Service) SignIn(c *gin.Context) {
 		// 最后一个参数是 httponly 需要设置成 false 否则 axios 不能访问到 cookie
 		c.SetCookie("token", string(res), 7*24*3600, "/", s.domain, s.secure, false)
 		status = http.StatusOK
-	} else {
-		status = http.StatusForbidden
+		c.Status(status)
+		return
 	}
-	c.Status(status)
+
+	status = http.StatusOK
+	c.String(http.StatusOK, "密码错误")
 }
 
 func (s *Service) checkSignInReqBody(req *SignInReq) error {
