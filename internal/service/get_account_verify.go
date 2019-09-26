@@ -61,8 +61,14 @@ func (s *Service) GETAccountVerify(c *gin.Context) {
 		return
 	}
 
+	if res != "" {
+		status = http.StatusForbidden
+		c.String(status, string(res))
+		return
+	}
+
 	status = http.StatusOK
-	c.JSON(status, res)
+	c.Status(status)
 }
 
 func (s *Service) checkGETAccountVerifyReqBody(req *GETAccountVerifyReq) error {
