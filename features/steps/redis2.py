@@ -29,3 +29,9 @@ def step_impl(context, key):
     result = json.loads(val)
     for key in obj:
         assert_that(result[key], equal_to(obj[key]))
+
+
+@then('redis not exist "{key:str}"')
+def step_impl(context, key):
+    res = context.redis_client.get(key)
+    assert_that(res, equal_to(None))

@@ -126,12 +126,12 @@ func main() {
 	})
 	r.GET("/verify", svr1.Verify)
 	r.GET("/getaccount", svr1.GetAccount)
-	r.GET("/signout", svr1.SignOut)
 	r.GET("/verifyauthcode", svr1.VerifyAuthCode)
 	r.POST("/genauthcode", svr1.GenAuthCode)
 	r.POST("/update", svr1.Update)
-	r.POST("/signin", svr1.SignIn)
 	r.POST("/signup", svr1.SignUp)
+	//r.GET("/signout", svr1.SignOut)
+	//r.POST("/signin", svr1.SignIn)
 
 	r.POST("/account", svr2.POSTAccount)
 	r.GET("/account/:token", svr2.GETAccount)
@@ -139,6 +139,8 @@ func main() {
 	r.POST("/authcode/:type", svr2.POSTAuthCode)
 	r.GET("/verify/authcode/:type", svr2.POSTAuthCodeVerify)
 	r.GET("/verify/account", svr2.GETAccountVerify)
+	r.GET("/signout/:token", svr2.SignOut)
+	r.POST("/signin", svr2.SignIn)
 
 	infoLog.Infof("%v init success, port [%v]", os.Args[0], config.GetString("service.port"))
 

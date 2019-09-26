@@ -48,3 +48,10 @@ def step_impl(context, status):
             assert_that(result[key], equal_to(obj["json"][key]))
     if "text" in obj:
         assert_that(res.text, equal_to(obj["text"].strip()))
+    if "cookies" in obj:
+        for key in obj["cookies"]:
+            cookies = res.cookies
+            if obj["cookies"][key] == "exist":
+                assert_that(obj["cookies"], contains(key))
+            else:
+                assert_that(cookies["token"], equal_to(obj["cookies"][key]))
