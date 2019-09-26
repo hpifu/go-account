@@ -46,3 +46,5 @@ def step_impl(context, status):
         result = json.loads(res.text)
         for key in obj["json"]:
             assert_that(result[key], equal_to(obj["json"][key]))
+    if "text" in obj:
+        assert_that(res.text, equal_to(obj["text"].strip()))

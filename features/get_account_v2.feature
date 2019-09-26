@@ -1,7 +1,7 @@
 Feature: account [GET] 获取账号测试
 
     Scenario: account
-        Given redis set "d571bda90c2d4e32a793b8a1ff4ff984"
+        Given redis set object "d571bda90c2d4e32a793b8a1ff4ff984"
             """
             {
                 "phone": "13112341234",

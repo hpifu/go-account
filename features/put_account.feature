@@ -10,7 +10,7 @@ Feature: PUT /account/:token/:field
             INSERT INTO accounts (id, phone, email, password, first_name, last_name, birthday, gender)
             VALUES (1, "13112345678", "hatlonely1@foxmail.com", "12345678", "悟空", "孙", "1992-01-01", 1)
             """
-        Given redis set "d571bda90c2d4e32a793b8a1ff4ff984"
+        Given redis set object "d571bda90c2d4e32a793b8a1ff4ff984"
             """
             {
                 "id": 1
@@ -31,7 +31,7 @@ Feature: PUT /account/:token/:field
                 "phone": "13112341234"
             }
             """
-        Then redis get "d571bda90c2d4e32a793b8a1ff4ff984"
+        Then redis get object "d571bda90c2d4e32a793b8a1ff4ff984"
             """
             {
                 "phone": "13112341234"
@@ -53,7 +53,7 @@ Feature: PUT /account/:token/:field
             INSERT INTO accounts (id, phone, email, password, first_name, last_name, birthday, gender)
             VALUES (1, "13112345678", "hatlonely1@foxmail.com", "12345678", "悟空", "孙", "1992-01-01", 1)
             """
-        Given redis set "d571bda90c2d4e32a793b8a1ff4ff984"
+        Given redis set object "d571bda90c2d4e32a793b8a1ff4ff984"
             """
             {
                 "id": 1
@@ -74,7 +74,7 @@ Feature: PUT /account/:token/:field
                 "email": "hatlonely2@foxmail.com"
             }
             """
-        Then redis get "d571bda90c2d4e32a793b8a1ff4ff984"
+        Then redis get object "d571bda90c2d4e32a793b8a1ff4ff984"
             """
             {
                 "email": "hatlonely2@foxmail.com"
@@ -97,7 +97,7 @@ Feature: PUT /account/:token/:field
             INSERT INTO accounts (id, phone, email, password, first_name, last_name, birthday, gender)
             VALUES (1, "13112345678", "hatlonely1@foxmail.com", "12345678", "悟空", "孙", "1992-01-01", 1)
             """
-        Given redis set "d571bda90c2d4e32a793b8a1ff4ff984"
+        Given redis set object "d571bda90c2d4e32a793b8a1ff4ff984"
             """
             {
                 "id": 1
@@ -118,7 +118,7 @@ Feature: PUT /account/:token/:field
                 "birthday": "1994-12-31"
             }
             """
-        Then redis get "d571bda90c2d4e32a793b8a1ff4ff984"
+        Then redis get object "d571bda90c2d4e32a793b8a1ff4ff984"
             """
             {
                 "birthday": "1994-12-31"
@@ -140,7 +140,7 @@ Feature: PUT /account/:token/:field
             INSERT INTO accounts (id, phone, email, password, first_name, last_name, birthday, gender)
             VALUES (1, "13112345678", "hatlonely1@foxmail.com", "12345678", "悟空", "孙", "1992-01-01", 1)
             """
-        Given redis set "d571bda90c2d4e32a793b8a1ff4ff984"
+        Given redis set object "d571bda90c2d4e32a793b8a1ff4ff984"
             """
             {
                 "id": 1
@@ -161,7 +161,7 @@ Feature: PUT /account/:token/:field
                 "gender": 0
             }
             """
-        Then redis get "d571bda90c2d4e32a793b8a1ff4ff984"
+        Then redis get object "d571bda90c2d4e32a793b8a1ff4ff984"
             """
             {
                 "gender": 0
@@ -183,7 +183,7 @@ Feature: PUT /account/:token/:field
             INSERT INTO accounts (id, phone, email, password, first_name, last_name, birthday, gender)
             VALUES (1, "13112345678", "hatlonely1@foxmail.com", "12345678", "悟空", "孙", "1992-01-01", 1)
             """
-        Given redis set "d571bda90c2d4e32a793b8a1ff4ff984"
+        Given redis set object "d571bda90c2d4e32a793b8a1ff4ff984"
             """
             {
                 "id": 1
@@ -206,7 +206,7 @@ Feature: PUT /account/:token/:field
                 "last_name": "猪"
             }
             """
-        Then redis get "d571bda90c2d4e32a793b8a1ff4ff984"
+        Then redis get object "d571bda90c2d4e32a793b8a1ff4ff984"
             """
             {
                 "firstName": "八戒",
@@ -229,7 +229,7 @@ Feature: PUT /account/:token/:field
             INSERT INTO accounts (id, phone, email, password, first_name, last_name, birthday, gender)
             VALUES (1, "13112345678", "hatlonely1@foxmail.com", "12345678", "悟空", "孙", "1992-01-01", 1)
             """
-        Given redis set "d571bda90c2d4e32a793b8a1ff4ff984"
+        Given redis set object "d571bda90c2d4e32a793b8a1ff4ff984"
             """
             {
                 "id": 1,
@@ -252,7 +252,7 @@ Feature: PUT /account/:token/:field
                 "password": "11112222"
             }
             """
-        Then redis get "d571bda90c2d4e32a793b8a1ff4ff984"
+        Then redis get object "d571bda90c2d4e32a793b8a1ff4ff984"
             """
             {
                 "password": "11112222"
@@ -274,7 +274,7 @@ Feature: PUT /account/:token/:field
             INSERT INTO accounts (id, phone, email, password, first_name, last_name, birthday, gender)
             VALUES (1, "13112345678", "hatlonely1@foxmail.com", "12345678", "悟空", "孙", "1992-01-01", 1)
             """
-        Given redis set "d571bda90c2d4e32a793b8a1ff4ff984"
+        Given redis set object "d571bda90c2d4e32a793b8a1ff4ff984"
             """
             {
                 "id": 1,
@@ -297,7 +297,7 @@ Feature: PUT /account/:token/:field
                 "password": "12345678"
             }
             """
-        Then redis get "d571bda90c2d4e32a793b8a1ff4ff984"
+        Then redis get object "d571bda90c2d4e32a793b8a1ff4ff984"
             """
             {
                 "password": "12345678"

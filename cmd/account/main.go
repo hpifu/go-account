@@ -3,6 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
+	"strings"
+
 	"github.com/gin-gonic/gin"
 	"github.com/hpifu/go-account/internal/account"
 	"github.com/hpifu/go-account/internal/logger"
@@ -11,8 +14,6 @@ import (
 	"github.com/hpifu/go-account/internal/rediscache"
 	"github.com/hpifu/go-account/internal/service"
 	"github.com/spf13/viper"
-	"os"
-	"strings"
 )
 
 // AppVersion name
@@ -136,7 +137,7 @@ func main() {
 	r.GET("/account/:token", svr2.GETAccount)
 	r.PUT("/account/:token/:field", svr2.PUTAccount)
 	r.POST("/authcode/:type", svr2.POSTAuthCode)
-	//r.POST("/authcode/:type/vertify", svr2.POSTAuthCode)
+	r.GET("/authcode/:type/verify", svr2.POSTAuthCodeVerify)
 
 	infoLog.Infof("%v init success, port [%v]", os.Args[0], config.GetString("service.port"))
 

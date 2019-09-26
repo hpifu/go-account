@@ -12,7 +12,7 @@ Feature: POST /authcode
             }
             """
         Then http 检查 201
-        Then redis get "ac_hatlonely@foxmail.com"
+        Then redis get object "ac_hatlonely@foxmail.com"
             """
             {}
             """

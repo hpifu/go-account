@@ -5,10 +5,15 @@ from hamcrest import *
 import json
 
 
-@given('redis set "{key:str}"')
+@given('redis set object "{key:str}"')
 def step_impl(context, key):
     obj = json.loads(context.text)
     context.redis_client.set(key, json.dumps(obj))
+
+
+@given('redis set string "{key:str}"')
+def step_impl(context, key):
+    context.redis_client.set(key, context.text.strip())
 
 
 @given('redis del "{key:str}"')
@@ -16,7 +21,7 @@ def step_impl(context, key):
     context.redis_client.delete(key)
 
 
-@then('redis get "{key:str}"')
+@then('redis get object "{key:str}"')
 def step_impl(context, key):
     obj = json.loads(context.text)
     val = context.redis_client.get(key)
