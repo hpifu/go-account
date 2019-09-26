@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hpifu/go-account/internal/account"
 	"github.com/hpifu/go-account/internal/logger"
 	"github.com/hpifu/go-account/internal/mail"
 	"github.com/hpifu/go-account/internal/mysqldb"
@@ -56,9 +55,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	account.InfoLog = infoLog
-	account.WarnLog = warnLog
-	account.AccessLog = accessLog
 
 	service.InfoLog = infoLog
 	service.WarnLog = warnLog
@@ -99,7 +95,6 @@ func main() {
 	domain := config.GetString("service.cookieDomain")
 	origin := config.GetString("service.allowOrigin")
 	// init services
-	svr1 := account.NewService(db, cache, mc, secure, domain)
 	svr2 := service.NewService(db, cache, mc, secure, domain)
 
 	// init gin
@@ -124,14 +119,6 @@ func main() {
 	r.GET("/ping", func(ctx *gin.Context) {
 		ctx.String(200, "ok")
 	})
-	r.GET("/verify", svr1.Verify)
-	r.GET("/getaccount", svr1.GetAccount)
-	r.GET("/verifyauthcode", svr1.VerifyAuthCode)
-	r.POST("/genauthcode", svr1.GenAuthCode)
-	r.POST("/update", svr1.Update)
-	r.POST("/signup", svr1.SignUp)
-	//r.GET("/signout", svr1.SignOut)
-	//r.POST("/signin", svr1.SignIn)
 
 	r.POST("/account", svr2.POSTAccount)
 	r.GET("/account/:token", svr2.GETAccount)
