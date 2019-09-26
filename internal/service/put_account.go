@@ -77,7 +77,7 @@ func (s *Service) PUTAccount(c *gin.Context) {
 		return
 	}
 	if res != "" {
-		status = http.StatusForbidden
+		status = http.StatusOK
 		c.String(status, string(res))
 		return
 	}

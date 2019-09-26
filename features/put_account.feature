@@ -290,7 +290,12 @@ Feature: PUT /account/:token/:field
                 }
             }
             """
-        Then http 检查 403
+        Then http 检查 200
+            """
+            {
+                "text": "密码错误"
+            }
+            """
         Then mysql 检查 "SELECT * FROM accounts WHERE id=1"
             """
             {
