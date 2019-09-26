@@ -20,6 +20,11 @@ Feature: GET /verify/account
             }
             """
         Then http 检查 200
+            """
+            {
+                "text": ""
+            }
+            """
         Given mysql 执行
             """
             DELETE FROM accounts WHERE id=1
@@ -45,7 +50,7 @@ Feature: GET /verify/account
                 }
             }
             """
-        Then http 检查 403
+        Then http 检查 200
             """
             {
                 "text": "电话号码已存在"
@@ -75,7 +80,7 @@ Feature: GET /verify/account
                 }
             }
             """
-        Then http 检查 403
+        Then http 检查 200
             """
             {
                 "text": "邮箱已存在"
@@ -106,6 +111,11 @@ Feature: GET /verify/account
             }
             """
         Then http 检查 200
+            """
+            {
+                "text": ""
+            }
+            """
         When http 请求 GET /verify/account
             """
             {
@@ -125,7 +135,7 @@ Feature: GET /verify/account
                 }
             }
             """
-        Then http 检查 403
+        Then http 检查 200
             """
             {
                 "text": "账号不存在"

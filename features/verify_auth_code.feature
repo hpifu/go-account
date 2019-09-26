@@ -31,7 +31,7 @@ Feature: GET /verify/authcode/:type
                 }
             }
             """
-        Then http 检查 403
+        Then http 检查 200
             """
             {
                 "text": "验证失败"
@@ -53,7 +53,7 @@ Feature: GET /verify/authcode/:type
                 }
             }
             """
-        Then http 检查 403
+        Then http 检查 200
             """
             {
                 "text": "验证码不存在"

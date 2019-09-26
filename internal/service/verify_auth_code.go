@@ -67,14 +67,9 @@ func (s *Service) VerifyAuthCode(c *gin.Context) {
 		c.String(status, err.Error())
 		return
 	}
-	if res != "" {
-		status = http.StatusForbidden
-		c.String(status, string(res))
-		return
-	}
 
 	status = http.StatusOK
-	c.Status(status)
+	c.String(status, string(res))
 }
 
 func (s *Service) validPOSTAuthCodeVerify(req *VerifyAuthCodeReq) error {
