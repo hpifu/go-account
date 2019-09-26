@@ -9,6 +9,7 @@ import (
 	"github.com/hpifu/go-account/internal/mail"
 	"github.com/hpifu/go-account/internal/mysqldb"
 	"github.com/hpifu/go-account/internal/rediscache"
+	"github.com/hpifu/go-account/internal/service"
 	"github.com/spf13/viper"
 	"os"
 	"strings"
@@ -58,6 +59,10 @@ func main() {
 	account.WarnLog = warnLog
 	account.AccessLog = accessLog
 
+	service.InfoLog = infoLog
+	service.WarnLog = warnLog
+	service.AccessLog = accessLog
+
 	// init mysqldb
 	db, err := mysqldb.NewMysqlDB(config.GetString("mysqldb.uri"))
 	if err != nil {
@@ -93,7 +98,8 @@ func main() {
 	domain := config.GetString("service.cookieDomain")
 	origin := config.GetString("service.allowOrigin")
 	// init services
-	service := account.NewService(db, cache, mc, secure, domain)
+	svr1 := account.NewService(db, cache, mc, secure, domain)
+	svr2 := service.NewService(db, cache, mc, secure, domain)
 
 	// init gin
 	gin.SetMode(gin.ReleaseMode)
@@ -117,16 +123,17 @@ func main() {
 	r.GET("/ping", func(ctx *gin.Context) {
 		ctx.String(200, "ok")
 	})
-	r.GET("/verify", service.Verify)
-	r.GET("/getaccount", service.GetAccount)
-	r.GET("/signout", service.SignOut)
-	r.GET("/verifyauthcode", service.VerifyAuthCode)
-	r.POST("/genauthcode", service.GenAuthCode)
-	r.POST("/update", service.Update)
-	r.POST("/signin", service.SignIn)
-	r.POST("/signup", service.SignUp)
-	r.GET("/account/:token", service.GETAccountV2)
-	r.PUT("/account", service.POSTAccount)
+	r.GET("/verify", svr1.Verify)
+	r.GET("/getaccount", svr1.GetAccount)
+	r.GET("/signout", svr1.SignOut)
+	r.GET("/verifyauthcode", svr1.VerifyAuthCode)
+	r.POST("/genauthcode", svr1.GenAuthCode)
+	r.POST("/update", svr1.Update)
+	r.POST("/signin", svr1.SignIn)
+	r.POST("/signup", svr1.SignUp)
+	r.POST("/account", svr2.POSTAccount)
+	r.GET("/account/:token", svr2.GETAccount)
+	r.PUT("/account/:token/:field", svr2.PUTAccount)
 
 	infoLog.Infof("%v init success, port [%v]", os.Args[0], config.GetString("service.port"))
 

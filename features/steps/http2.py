@@ -15,15 +15,22 @@ def step_impl(context, method, path):
         obj = {}
     if "params" not in obj:
         obj["params"] = {}
+    if "json" not in obj:
+        obj["json"] = {}
     if method == "GET":
         context.res = requests.get(
             "{}{}".format(context.config["url"], path),
-            params=obj["params"]
+            params=obj["params"], json=obj["json"]
         )
     if method == "PUT":
         context.res = requests.put(
             "{}{}".format(context.config["url"], path),
-            json=obj["json"]
+            params=obj["params"], json=obj["json"]
+        )
+    if method == "POST":
+        context.res = requests.post(
+            "{}{}".format(context.config["url"], path),
+            params=obj["params"], json=obj["json"]
         )
 
 

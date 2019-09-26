@@ -14,3 +14,13 @@ def step_impl(context, key):
 @given('redis del "{key:str}"')
 def step_impl(context, key):
     context.redis_client.delete(key)
+
+
+@then('redis get "{key:str}"')
+def step_impl(context, key):
+    obj = json.loads(context.text)
+    val = context.redis_client.get(key)
+    print(val)
+    result = json.loads(val)
+    for key in obj:
+        assert_that(result[key], equal_to(obj[key]))
