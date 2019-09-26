@@ -137,7 +137,8 @@ func main() {
 	r.GET("/account/:token", svr2.GETAccount)
 	r.PUT("/account/:token/:field", svr2.PUTAccount)
 	r.POST("/authcode/:type", svr2.POSTAuthCode)
-	r.GET("/authcode/:type/verify", svr2.POSTAuthCodeVerify)
+	r.GET("/verify/authcode/:type", svr2.POSTAuthCodeVerify)
+	r.GET("/verify/account", svr2.GETAccountVerify)
 
 	infoLog.Infof("%v init success, port [%v]", os.Args[0], config.GetString("service.port"))
 
