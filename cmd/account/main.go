@@ -124,8 +124,8 @@ func main() {
 	r.GET("/account/:token", svr2.GETAccount)
 	r.PUT("/account/:token/:field", svr2.PUTAccount)
 	r.POST("/authcode/:type", svr2.POSTAuthCode)
-	r.GET("/verify/authcode/:type", svr2.POSTAuthCodeVerify)
-	r.GET("/verify/account", svr2.GETAccountVerify)
+	r.GET("/verify/authcode/:type", svr2.VerifyAuthCode)
+	r.GET("/verify/account", svr2.VerifyAccount)
 	r.GET("/signout/:token", svr2.SignOut)
 	r.POST("/signin", svr2.SignIn)
 

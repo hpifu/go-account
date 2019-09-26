@@ -1,4 +1,4 @@
-Feature: POST /verify/authcode/:type
+Feature: GET /verify/authcode/:type
 
     Scenario:
         Given redis set string "ac_hatlonely@foxmail.com"

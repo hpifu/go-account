@@ -1,4 +1,4 @@
-Feature: POST /authcode
+Feature: POST /authcode/:type
 
     Scenario: case
         When http 请求 POST /authcode/email

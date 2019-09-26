@@ -9,17 +9,17 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type GETAccountVerifyReq struct {
+type VerifyAccountReq struct {
 	Field string `json:"field,omitempty" form:"field"`
 	Value string `json:"value,omitempty" form:"value"`
 }
 
-type GETAccountVerifyRes string
+type VerifyAccountRes string
 
-func (s *Service) GETAccountVerify(c *gin.Context) {
+func (s *Service) VerifyAccount(c *gin.Context) {
 	rid := c.DefaultQuery("rid", NewToken())
-	req := &GETAccountVerifyReq{}
-	var res GETAccountVerifyRes
+	req := &VerifyAccountReq{}
+	var res VerifyAccountRes
 	var err error
 	var buf []byte
 	status := http.StatusOK
@@ -53,9 +53,9 @@ func (s *Service) GETAccountVerify(c *gin.Context) {
 		return
 	}
 
-	res, err = s.getAccountVerify(req)
+	res, err = s.verifyAccount(req)
 	if err != nil {
-		WarnLog.WithField("@rid", rid).WithField("err", err).Warn("getAccountVerify failed")
+		WarnLog.WithField("@rid", rid).WithField("err", err).Warn("verifyAccount failed")
 		status = http.StatusInternalServerError
 		c.String(status, err.Error())
 		return
@@ -71,7 +71,7 @@ func (s *Service) GETAccountVerify(c *gin.Context) {
 	c.Status(status)
 }
 
-func (s *Service) checkGETAccountVerifyReqBody(req *GETAccountVerifyReq) error {
+func (s *Service) checkGETAccountVerifyReqBody(req *VerifyAccountReq) error {
 	if err := rule.Check(map[interface{}][]rule.Rule{
 		req.Field: {rule.Required, rule.In(map[interface{}]struct{}{"phone": {}, "email": {}, "username": {}})},
 		req.Value: {rule.Required},
@@ -82,7 +82,7 @@ func (s *Service) checkGETAccountVerifyReqBody(req *GETAccountVerifyReq) error {
 	return nil
 }
 
-func (s *Service) getAccountVerify(req *GETAccountVerifyReq) (GETAccountVerifyRes, error) {
+func (s *Service) verifyAccount(req *VerifyAccountReq) (VerifyAccountRes, error) {
 	if req.Field == "phone" {
 		account, err := s.db.SelectAccountByPhone(req.Value)
 		if err != nil {
@@ -116,5 +116,5 @@ func (s *Service) getAccountVerify(req *GETAccountVerifyReq) (GETAccountVerifyRe
 		return "", nil
 	}
 
-	return GETAccountVerifyRes(fmt.Sprintf("未知字段 [%v]", req.Field)), nil
+	return VerifyAccountRes(fmt.Sprintf("未知字段 [%v]", req.Field)), nil
 }

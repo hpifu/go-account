@@ -1,4 +1,4 @@
-Feature: account [GET] 获取账号测试
+Feature: GET /account/:token
 
     Scenario: account
         Given redis set object "d571bda90c2d4e32a793b8a1ff4ff984"

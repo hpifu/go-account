@@ -8,19 +8,19 @@ import (
 	"net/http"
 )
 
-type POSTAuthCodeVertifyReq struct {
+type VerifyAuthCodeReq struct {
 	Type  string `json:"type,omitempty" uri:"type"`
 	Phone string `json:"phone,omitempty" form:"phone"`
 	Email string `json:"email,omitempty" form:"email"`
 	Code  string `json:"code,omitempty" form:"code"`
 }
 
-type POSTAuthCodeVertifyRes string
+type VerifyAuthCodeRes string
 
-func (s *Service) POSTAuthCodeVerify(c *gin.Context) {
+func (s *Service) VerifyAuthCode(c *gin.Context) {
 	rid := c.DefaultQuery("rid", NewToken())
-	req := &POSTAuthCodeVertifyReq{}
-	var res POSTAuthCodeVertifyRes
+	req := &VerifyAuthCodeReq{}
+	var res VerifyAuthCodeRes
 	var err error
 	status := http.StatusOK
 
@@ -60,9 +60,9 @@ func (s *Service) POSTAuthCodeVerify(c *gin.Context) {
 		return
 	}
 
-	res, err = s.postAuthCodeVerify(req)
+	res, err = s.verifyAuthCode(req)
 	if err != nil {
-		WarnLog.WithField("@rid", rid).WithField("err", err).Warn("postAuthCodeVerify failed")
+		WarnLog.WithField("@rid", rid).WithField("err", err).Warn("verifyAuthCode failed")
 		status = http.StatusInternalServerError
 		c.String(status, err.Error())
 		return
@@ -77,7 +77,7 @@ func (s *Service) POSTAuthCodeVerify(c *gin.Context) {
 	c.Status(status)
 }
 
-func (s *Service) validPOSTAuthCodeVerify(req *POSTAuthCodeVertifyReq) error {
+func (s *Service) validPOSTAuthCodeVerify(req *VerifyAuthCodeReq) error {
 	if err := rule.Check(map[interface{}][]rule.Rule{
 		req.Type: {rule.Required, rule.In(map[interface{}]struct{}{"phone": {}, "email": {}})},
 		req.Code: {rule.Required, rule.ValidCode},
@@ -99,7 +99,7 @@ func (s *Service) validPOSTAuthCodeVerify(req *POSTAuthCodeVertifyReq) error {
 	return nil
 }
 
-func (s *Service) postAuthCodeVerify(req *POSTAuthCodeVertifyReq) (POSTAuthCodeVertifyRes, error) {
+func (s *Service) verifyAuthCode(req *VerifyAuthCodeReq) (VerifyAuthCodeRes, error) {
 	if req.Type == "phone" {
 		code, err := s.cache.GetAuthCode(req.Phone)
 		if err != nil {
@@ -128,5 +128,5 @@ func (s *Service) postAuthCodeVerify(req *POSTAuthCodeVertifyReq) (POSTAuthCodeV
 		return "", nil
 	}
 
-	return POSTAuthCodeVertifyRes(fmt.Sprintf("未知字段 [%v]", req.Type)), nil
+	return VerifyAuthCodeRes(fmt.Sprintf("未知字段 [%v]", req.Type)), nil
 }

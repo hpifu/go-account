@@ -1,4 +1,4 @@
-Feature: POST /verify/account
+Feature: GET /verify/account
 
     Scenario: case nonexist phone
         Given mysql 执行
