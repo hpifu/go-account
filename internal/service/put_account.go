@@ -24,6 +24,8 @@ type PUTAccountReq struct {
 	Avatar      string   `json:"avatar,omitempty" form:"avatar"`
 }
 
+type PUTAccountRes struct{}
+
 func (s *Service) PUTAccount(c *gin.Context) {
 	rid := c.DefaultQuery("rid", NewToken())
 	req := &PUTAccountReq{}

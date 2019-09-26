@@ -131,9 +131,12 @@ func main() {
 	r.POST("/update", svr1.Update)
 	r.POST("/signin", svr1.SignIn)
 	r.POST("/signup", svr1.SignUp)
+
 	r.POST("/account", svr2.POSTAccount)
 	r.GET("/account/:token", svr2.GETAccount)
 	r.PUT("/account/:token/:field", svr2.PUTAccount)
+	r.POST("/authcode/:type", svr2.POSTAuthCode)
+	//r.POST("/authcode/:type/vertify", svr2.POSTAuthCode)
 
 	infoLog.Infof("%v init success, port [%v]", os.Args[0], config.GetString("service.port"))
 

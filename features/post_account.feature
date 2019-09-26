@@ -1,4 +1,4 @@
-Feature: account [POST] 新建账号测试
+Feature: POST /account
 
     Scenario: account case1
         Given mysql 执行
