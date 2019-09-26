@@ -24,11 +24,12 @@ type PUTAccountReq struct {
 	Avatar      string   `json:"avatar,omitempty" form:"avatar"`
 }
 
-type PUTAccountRes struct{}
+type PUTAccountRes string
 
 func (s *Service) PUTAccount(c *gin.Context) {
 	rid := c.DefaultQuery("rid", NewToken())
 	req := &PUTAccountReq{}
+	var res PUTAccountRes
 	var err error
 	status := http.StatusOK
 
@@ -37,7 +38,7 @@ func (s *Service) PUTAccount(c *gin.Context) {
 			"host":   c.Request.Host,
 			"url":    c.Request.URL.String(),
 			"req":    req,
-			"res":    nil,
+			"res":    res,
 			"rid":    rid,
 			"err":    err,
 			"status": status,
@@ -68,17 +69,16 @@ func (s *Service) PUTAccount(c *gin.Context) {
 		return
 	}
 
-	var err1 error
-	err1, err = s.putAccount(req)
+	res, err = s.putAccount(req)
 	if err != nil {
 		WarnLog.WithField("@rid", rid).WithField("err", err).Warn("putAccount failed")
 		status = http.StatusInternalServerError
 		c.String(status, err.Error())
 		return
 	}
-	if err1 != nil {
+	if res != "" {
 		status = http.StatusForbidden
-		c.String(status, err1.Error())
+		c.String(status, string(res))
 		return
 	}
 
@@ -134,14 +134,14 @@ func (s *Service) checkPUTAccountReqBody(req *PUTAccountReq) error {
 	}
 }
 
-func (s *Service) putAccount(req *PUTAccountReq) (error, error) {
+func (s *Service) putAccount(req *PUTAccountReq) (PUTAccountRes, error) {
 	account, err := s.cache.GetAccount(req.Token)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	if account == nil {
-		return fmt.Errorf("会话已过期，请重新登录"), nil
+		return "会话已过期，请重新登录", nil
 	}
 
 	switch req.Field {
@@ -153,7 +153,7 @@ func (s *Service) putAccount(req *PUTAccountReq) (error, error) {
 		account.Email = req.Email
 	case "password":
 		if req.OldPassword != account.Password {
-			return fmt.Errorf("密码错误"), nil
+			return "密码错误", nil
 		}
 		_, err = s.db.UpdateAccountPassword(account.ID, req.Password)
 		account.Password = req.Password
@@ -172,16 +172,16 @@ func (s *Service) putAccount(req *PUTAccountReq) (error, error) {
 		_, err = s.db.UpdateAccountAvatar(account.ID, req.Avatar)
 		account.Avatar = req.Avatar
 	default:
-		return fmt.Errorf("未知字段 [%v]", req.Field), nil
+		return PUTAccountRes(fmt.Sprintf("未知字段 [%v]", req.Field)), nil
 	}
 
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	if err := s.cache.SetAccount(req.Token, account); err != nil {
-		return nil, err
+		return "", err
 	}
 
-	return nil, nil
+	return "", nil
 }
