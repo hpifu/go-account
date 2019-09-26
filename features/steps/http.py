@@ -52,6 +52,6 @@ def step_impl(context, status):
         for key in obj["cookies"]:
             cookies = res.cookies
             if obj["cookies"][key] == "exist":
-                assert_that(obj["cookies"], contains(key))
+                assert_that(cookies[key], is_not(None))
             else:
-                assert_that(cookies["token"], equal_to(obj["cookies"][key]))
+                assert_that(cookies[key], equal_to(obj["cookies"][key]))
