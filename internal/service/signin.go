@@ -16,7 +16,7 @@ type SignInReq struct {
 
 type SignInRes string
 
-func (s *Service) ProcessSignIn(c *gin.Context) (interface{}, interface{}, int, error) {
+func (s *Service) SignIn(c *gin.Context) (interface{}, interface{}, int, error) {
 	req := &SignInReq{}
 
 	if err := c.Bind(req); err != nil {
@@ -29,7 +29,7 @@ func (s *Service) ProcessSignIn(c *gin.Context) (interface{}, interface{}, int, 
 
 	account, err := s.db.SelectAccountByPhoneOrEmail(req.Username)
 	if err != nil {
-		return req, nil, http.StatusInternalServerError, err
+		return req, nil, http.StatusInternalServerError, fmt.Errorf("mysql select account failed. err: [%v]", err)
 	}
 
 	if account == nil || account.Password != req.Password {
@@ -38,7 +38,7 @@ func (s *Service) ProcessSignIn(c *gin.Context) (interface{}, interface{}, int, 
 
 	token := NewToken()
 	if err := s.cache.SetAccount(token, rediscache.NewAccount(account)); err != nil {
-		return req, nil, http.StatusInternalServerError, err
+		return req, nil, http.StatusInternalServerError, fmt.Errorf("redis set account falied. err: [%v]", err)
 	}
 
 	// 最后一个参数是 httponly 需要设置成 false 否则 axios 不能访问到 cookie

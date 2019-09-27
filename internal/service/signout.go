@@ -2,10 +2,10 @@ package service
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/hpifu/go-account/internal/rule"
-	"github.com/sirupsen/logrus"
-	"net/http"
 )
 
 type SignOutReq struct {
@@ -14,55 +14,25 @@ type SignOutReq struct {
 
 type SignOutRes struct{}
 
-func (s *Service) SignOut(c *gin.Context) {
-	rid := c.DefaultQuery("rid", NewToken())
+func (s *Service) SignOut(c *gin.Context) (interface{}, interface{}, int, error) {
 	req := &SignOutReq{}
-	var err error
-	var buf []byte
-	status := http.StatusOK
-
-	defer func() {
-		AccessLog.WithFields(logrus.Fields{
-			"host":   c.Request.Host,
-			"body":   string(buf),
-			"url":    c.Request.URL.String(),
-			"req":    req,
-			"res":    nil,
-			"rid":    rid,
-			"err":    err,
-			"status": status,
-		}).Info()
-	}()
 
 	if err := c.BindUri(req); err != nil {
-		err = fmt.Errorf("bind uri failed. err: [%v]", err)
-		WarnLog.WithField("@rid", rid).WithField("err", err).Warn()
-		status = http.StatusBadRequest
-		c.String(status, err.Error())
-		return
+		return nil, nil, http.StatusBadRequest, fmt.Errorf("bind uri failed. err: [%v]", err)
 	}
 
-	if err = s.checkSignOutReqBody(req); err != nil {
-		err = fmt.Errorf("check request body failed. body: [%v], err: [%v]", string(buf), err)
-		WarnLog.WithField("@rid", rid).WithField("err", err).Warn()
-		status = http.StatusBadRequest
-		c.String(status, err.Error())
-		return
+	if err := s.validSignOut(req); err != nil {
+		return req, nil, http.StatusBadRequest, fmt.Errorf("valid request failed. err: [%v]", err)
 	}
 
-	err = s.signOut(req)
-	if err != nil {
-		WarnLog.WithField("@rid", rid).WithField("err", err).Warn("signOut failed")
-		status = http.StatusInternalServerError
-		c.String(status, err.Error())
-		return
+	if err := s.cache.DelAccount(req.Token); err != nil {
+		return req, nil, http.StatusInternalServerError, fmt.Errorf("redis del account failed. err: [%v]", err)
 	}
 
-	status = http.StatusAccepted
-	c.Status(status)
+	return req, nil, http.StatusAccepted, nil
 }
 
-func (s *Service) checkSignOutReqBody(req *SignOutReq) error {
+func (s *Service) validSignOut(req *SignOutReq) error {
 	if err := rule.Check(map[interface{}][]rule.Rule{
 		req.Token: {rule.Required},
 	}); err != nil {
@@ -70,8 +40,4 @@ func (s *Service) checkSignOutReqBody(req *SignOutReq) error {
 	}
 
 	return nil
-}
-
-func (s *Service) signOut(req *SignOutReq) error {
-	return s.cache.DelAccount(req.Token)
 }

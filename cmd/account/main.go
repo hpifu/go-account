@@ -126,8 +126,8 @@ func main() {
 	r.POST("/authcode/:type", svr2.POSTAuthCode)
 	r.GET("/verify/authcode/:type", svr2.VerifyAuthCode)
 	r.GET("/verify/account", svr2.VerifyAccount)
-	r.GET("/signout/:token", svr2.SignOut)
-	r.POST("/signin", service.Decorator(svr2.ProcessSignIn))
+	r.GET("/signout/:token", service.Decorator(svr2.SignOut))
+	r.POST("/signin", service.Decorator(svr2.SignIn))
 
 	infoLog.Infof("%v init success, port [%v]", os.Args[0], config.GetString("service.port"))
 
