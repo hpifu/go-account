@@ -3,12 +3,14 @@ package service
 import (
 	"encoding/hex"
 	"fmt"
+	"math/rand"
+	"time"
+
+	"github.com/gin-gonic/gin"
 	"github.com/hpifu/go-account/internal/mail"
 	"github.com/hpifu/go-account/internal/mysqldb"
 	"github.com/hpifu/go-account/internal/rediscache"
 	"github.com/sirupsen/logrus"
-	"math/rand"
-	"time"
 )
 
 var InfoLog *logrus.Logger
@@ -42,6 +44,36 @@ func NewService(
 		mc:     mc,
 		secure: secure,
 		domain: domain,
+	}
+}
+
+func Decorator(inner func(*gin.Context) (interface{}, interface{}, int, error)) func(*gin.Context) {
+	return func(c *gin.Context) {
+		rid := c.DefaultQuery("rid", NewToken())
+		req, res, status, err := inner(c)
+		if err != nil {
+			c.String(status, err.Error())
+			WarnLog.WithField("@rid", rid).WithField("err", err).Warn()
+		} else if res == nil {
+			c.Status(status)
+		} else {
+			switch res.(type) {
+			case string:
+				c.String(status, res.(string))
+			default:
+				c.JSON(status, res)
+			}
+		}
+
+		AccessLog.WithFields(logrus.Fields{
+			"host":   c.Request.Host,
+			"url":    c.Request.URL.String(),
+			"req":    req,
+			"res":    res,
+			"rid":    rid,
+			"err":    err,
+			"status": status,
+		}).Info()
 	}
 }
 

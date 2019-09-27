@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hpifu/go-account/internal/rediscache"
 	"github.com/hpifu/go-account/internal/rule"
-	"github.com/sirupsen/logrus"
 )
 
 type SignInReq struct {
@@ -17,62 +16,37 @@ type SignInReq struct {
 
 type SignInRes string
 
-func (s *Service) SignIn(c *gin.Context) {
-	rid := c.DefaultQuery("rid", NewToken())
+func (s *Service) ProcessSignIn(c *gin.Context) (interface{}, interface{}, int, error) {
 	req := &SignInReq{}
-	var res SignInRes
-	var err error
-	status := http.StatusOK
-
-	defer func() {
-		AccessLog.WithFields(logrus.Fields{
-			"host":   c.Request.Host,
-			"url":    c.Request.URL.String(),
-			"req":    req,
-			"res":    res,
-			"rid":    rid,
-			"err":    err,
-			"status": status,
-		}).Info()
-	}()
 
 	if err := c.Bind(req); err != nil {
-		err = fmt.Errorf("bind json failed. err: [%v]", err)
-		WarnLog.WithField("@rid", rid).WithField("err", err).Warn()
-		status = http.StatusBadRequest
-		c.String(status, err.Error())
-		return
+		return nil, nil, http.StatusBadRequest, fmt.Errorf("bind failed. err: [%v]", err)
 	}
 
-	if err = s.checkSignInReqBody(req); err != nil {
-		err = fmt.Errorf("check request body failed. err: [%v]", err)
-		WarnLog.WithField("@rid", rid).WithField("err", err).Warn()
-		status = http.StatusBadRequest
-		c.String(status, err.Error())
-		return
+	if err := s.validSignIn(req); err != nil {
+		return req, nil, http.StatusBadRequest, fmt.Errorf("valid request failed. err: [%v]", err)
 	}
 
-	res, err = s.signIn(req)
+	account, err := s.db.SelectAccountByPhoneOrEmail(req.Username)
 	if err != nil {
-		WarnLog.WithField("@rid", rid).WithField("err", err).Warn("signIn failed")
-		status = http.StatusInternalServerError
-		c.String(status, err.Error())
-		return
+		return req, nil, http.StatusInternalServerError, err
 	}
 
-	if res != "" {
-		// 最后一个参数是 httponly 需要设置成 false 否则 axios 不能访问到 cookie
-		c.SetCookie("token", string(res), 7*24*3600, "/", s.domain, s.secure, false)
-		status = http.StatusOK
-		c.Status(status)
-		return
+	if account == nil || account.Password != req.Password {
+		return req, "密码错误", http.StatusOK, nil
 	}
 
-	status = http.StatusOK
-	c.String(http.StatusOK, "密码错误")
+	token := NewToken()
+	if err := s.cache.SetAccount(token, rediscache.NewAccount(account)); err != nil {
+		return req, nil, http.StatusInternalServerError, err
+	}
+
+	// 最后一个参数是 httponly 需要设置成 false 否则 axios 不能访问到 cookie
+	c.SetCookie("token", token, 7*24*3600, "/", s.domain, s.secure, false)
+	return req, nil, http.StatusOK, nil
 }
 
-func (s *Service) checkSignInReqBody(req *SignInReq) error {
+func (s *Service) validSignIn(req *SignInReq) error {
 	if err := rule.Check(map[interface{}][]rule.Rule{
 		req.Username: {rule.Required},
 		req.Password: {rule.Required, rule.AtLeast8Characters},
@@ -81,26 +55,4 @@ func (s *Service) checkSignInReqBody(req *SignInReq) error {
 	}
 
 	return nil
-}
-
-func (s *Service) signIn(req *SignInReq) (SignInRes, error) {
-	account, err := s.db.SelectAccountByPhoneOrEmail(req.Username)
-	if err != nil {
-		return "", err
-	}
-
-	if account == nil {
-		return "", nil
-	}
-
-	if account.Password != req.Password {
-		return "", nil
-	}
-
-	token := NewToken()
-	if err := s.cache.SetAccount(token, rediscache.NewAccount(account)); err != nil {
-		return "", err
-	}
-
-	return SignInRes(token), nil
 }
