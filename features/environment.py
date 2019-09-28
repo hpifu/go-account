@@ -17,7 +17,7 @@ register_type(bool=lambda x: True if x == "true" else False)
 
 
 config = {
-    "prefix": "output/account",
+    "prefix": "output/go-account",
     "service": {
         "port": 16060,
         "cookieSecure": False,
