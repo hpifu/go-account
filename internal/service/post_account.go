@@ -2,12 +2,13 @@ package service
 
 import (
 	"fmt"
+	"net/http"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/hpifu/go-account/internal/c"
 	"github.com/hpifu/go-account/internal/mysql"
-	"github.com/hpifu/go-account/internal/rule"
-	"net/http"
-	"time"
+	"github.com/hpifu/go-kit/rule"
 )
 
 type Account struct {

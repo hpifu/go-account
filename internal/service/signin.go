@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/hpifu/go-account/internal/redis"
-	"github.com/hpifu/go-account/internal/rule"
+	"github.com/hpifu/go-kit/rule"
 )
 
 type SignInReq struct {

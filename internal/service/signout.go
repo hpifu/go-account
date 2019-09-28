@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hpifu/go-account/internal/rule"
+	"github.com/hpifu/go-kit/rule"
 )
 
 type SignOutReq struct {

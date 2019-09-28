@@ -2,9 +2,10 @@ package service
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/hpifu/go-account/internal/rule"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/hpifu/go-kit/rule"
 )
 
 type GETAccountReq struct {
@@ -13,7 +14,7 @@ type GETAccountReq struct {
 
 type GETAccountRes Account
 
-func (s* Service) GETAccount(c *gin.Context) (interface{}, interface{}, int, error) {
+func (s *Service) GETAccount(c *gin.Context) (interface{}, interface{}, int, error) {
 	req := &GETAccountReq{}
 
 	if err := c.BindUri(req); err != nil {

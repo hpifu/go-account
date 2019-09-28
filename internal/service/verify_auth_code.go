@@ -3,7 +3,7 @@ package service
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/hpifu/go-account/internal/rule"
+	"github.com/hpifu/go-kit/rule"
 	"net/http"
 )
 

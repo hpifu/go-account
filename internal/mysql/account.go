@@ -3,7 +3,7 @@ package mysql
 import (
 	"fmt"
 	"github.com/hpifu/go-account/internal/c"
-	"github.com/hpifu/go-account/internal/rule"
+	"github.com/hpifu/go-kit/rule"
 	"github.com/jinzhu/gorm"
 	"strings"
 	"time"

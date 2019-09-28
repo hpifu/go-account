@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hpifu/go-account/internal/logger"
+	"github.com/hpifu/go-kit/logger"
 	"github.com/hpifu/go-account/internal/mail"
 	"github.com/hpifu/go-account/internal/mysql"
 	"github.com/hpifu/go-account/internal/redis"
