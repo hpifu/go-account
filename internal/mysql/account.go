@@ -1,4 +1,4 @@
-package mysqldb
+package mysql
 
 import (
 	"fmt"
@@ -22,7 +22,7 @@ type Account struct {
 	Role      int       `gorm:"type:bigint(20) default 0;not null" json:"role"`
 }
 
-func (m *MysqlDB) SelectAccountByPhoneOrEmail(key string) (*Account, error) {
+func (m *Mysql) SelectAccountByPhoneOrEmail(key string) (*Account, error) {
 	if err := rule.ValidPhone(key); err == nil {
 		return m.SelectAccountByPhone(key)
 	}
@@ -33,7 +33,7 @@ func (m *MysqlDB) SelectAccountByPhoneOrEmail(key string) (*Account, error) {
 	return nil, fmt.Errorf("key [%v] is not a valid phone or email", key)
 }
 
-func (m *MysqlDB) SelectAccountByPhone(phone string) (*Account, error) {
+func (m *Mysql) SelectAccountByPhone(phone string) (*Account, error) {
 	account := &Account{}
 	if err := m.db.Where("phone=?", phone).First(account).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
@@ -45,7 +45,7 @@ func (m *MysqlDB) SelectAccountByPhone(phone string) (*Account, error) {
 	return account, nil
 }
 
-func (m *MysqlDB) SelectAccountByEmail(email string) (*Account, error) {
+func (m *Mysql) SelectAccountByEmail(email string) (*Account, error) {
 	account := &Account{}
 	if err := m.db.Where("email=?", email).First(account).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
@@ -57,7 +57,7 @@ func (m *MysqlDB) SelectAccountByEmail(email string) (*Account, error) {
 	return account, nil
 }
 
-func (m *MysqlDB) UpdateAccountName(id int, firstName string, lastName string) (bool, error) {
+func (m *Mysql) UpdateAccountName(id int, firstName string, lastName string) (bool, error) {
 	account := &Account{
 		ID:        id,
 		FirstName: firstName,
@@ -69,7 +69,7 @@ func (m *MysqlDB) UpdateAccountName(id int, firstName string, lastName string) (
 	return true, nil
 }
 
-func (m *MysqlDB) UpdateAccountEmail(id int, email string) (bool, error) {
+func (m *Mysql) UpdateAccountEmail(id int, email string) (bool, error) {
 	account := &Account{
 		ID:    id,
 		Email: email,
@@ -88,7 +88,7 @@ func (m *MysqlDB) UpdateAccountEmail(id int, email string) (bool, error) {
 	return true, nil
 }
 
-func (m *MysqlDB) UpdateAccountPhone(id int, phone string) (bool, error) {
+func (m *Mysql) UpdateAccountPhone(id int, phone string) (bool, error) {
 	account := &Account{
 		ID:    id,
 		Phone: phone,
@@ -107,7 +107,7 @@ func (m *MysqlDB) UpdateAccountPhone(id int, phone string) (bool, error) {
 	return true, nil
 }
 
-func (m *MysqlDB) UpdateAccountBirthday(id int, birthday time.Time) (bool, error) {
+func (m *Mysql) UpdateAccountBirthday(id int, birthday time.Time) (bool, error) {
 	account := &Account{
 		ID:       id,
 		Birthday: birthday,
@@ -118,7 +118,7 @@ func (m *MysqlDB) UpdateAccountBirthday(id int, birthday time.Time) (bool, error
 	return true, nil
 }
 
-func (m *MysqlDB) UpdateAccountPassword(id int, password string) (bool, error) {
+func (m *Mysql) UpdateAccountPassword(id int, password string) (bool, error) {
 	account := &Account{
 		ID:       id,
 		Password: password,
@@ -129,14 +129,14 @@ func (m *MysqlDB) UpdateAccountPassword(id int, password string) (bool, error) {
 	return true, nil
 }
 
-func (m *MysqlDB) UpdateAccountGender(id int, gender c.Gender) (bool, error) {
+func (m *Mysql) UpdateAccountGender(id int, gender c.Gender) (bool, error) {
 	if err := m.db.Model(&Account{}).Where("id=?", id).Update("gender", gender).Error; err != nil {
 		return false, err
 	}
 	return true, nil
 }
 
-func (m *MysqlDB) UpdateAccountAvatar(id int, avatar string) (bool, error) {
+func (m *Mysql) UpdateAccountAvatar(id int, avatar string) (bool, error) {
 	account := &Account{
 		ID:     id,
 		Avatar: avatar,
@@ -147,7 +147,7 @@ func (m *MysqlDB) UpdateAccountAvatar(id int, avatar string) (bool, error) {
 	return true, nil
 }
 
-func (m *MysqlDB) InsertAccount(account *Account) (bool, error) {
+func (m *Mysql) InsertAccount(account *Account) (bool, error) {
 	if account.Email == "" && account.Phone == "" {
 		return false, fmt.Errorf("email or phone are is null, account [%#v]", account)
 	}

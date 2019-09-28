@@ -1,4 +1,4 @@
-package rediscache
+package redis
 
 import (
 	"testing"
@@ -8,7 +8,7 @@ import (
 )
 
 func TestRedisCache_SetGetDelAccount(t *testing.T) {
-	rc, err := NewRedisCache(&Option{
+	rc, err := NewRedis(&Option{
 		Address:         "test-redis:6379",
 		Timeout:         20 * time.Millisecond,
 		Retries:         3,

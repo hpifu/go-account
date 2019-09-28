@@ -1,10 +1,10 @@
-package rediscache
+package redis
 
 import (
 	"encoding/json"
 	"github.com/go-redis/redis"
 	"github.com/hpifu/go-account/internal/c"
-	"github.com/hpifu/go-account/internal/mysqldb"
+	"github.com/hpifu/go-account/internal/mysql"
 	"time"
 )
 
@@ -19,7 +19,7 @@ type Option struct {
 	AuthCodeExpiration time.Duration
 }
 
-type RedisCache struct {
+type Redis struct {
 	client *redis.Client
 	option *Option
 }
@@ -36,7 +36,7 @@ type Account struct {
 	Avatar    string   `json:"avatar,omitempty"`
 }
 
-func NewAccount(account *mysqldb.Account) *Account {
+func NewAccount(account *mysql.Account) *Account {
 	return &Account{
 		ID:        account.ID,
 		Email:     account.Email,
@@ -50,7 +50,7 @@ func NewAccount(account *mysqldb.Account) *Account {
 	}
 }
 
-func NewRedisCache(option *Option) (*RedisCache, error) {
+func NewRedis(option *Option) (*Redis, error) {
 	client := redis.NewClient(&redis.Options{
 		Addr:         option.Address,
 		DialTimeout:  option.Timeout,
@@ -66,21 +66,21 @@ func NewRedisCache(option *Option) (*RedisCache, error) {
 		return nil, err
 	}
 
-	return &RedisCache{
+	return &Redis{
 		client: client,
 		option: option,
 	}, nil
 }
 
-func (rc *RedisCache) SetAuthCode(key string, code string) error {
+func (rc *Redis) SetAuthCode(key string, code string) error {
 	return rc.client.Set("ac_"+key, code, rc.option.AuthCodeExpiration).Err()
 }
 
-func (rc *RedisCache) DelAuthCode(key string) error {
+func (rc *Redis) DelAuthCode(key string) error {
 	return rc.client.Del("ac_" + key).Err()
 }
 
-func (rc *RedisCache) GetAuthCode(key string) (string, error) {
+func (rc *Redis) GetAuthCode(key string) (string, error) {
 	buf, err := rc.client.Get("ac_" + key).Result()
 	if err == redis.Nil {
 		return "", nil
@@ -92,7 +92,7 @@ func (rc *RedisCache) GetAuthCode(key string) (string, error) {
 	return string(buf), nil
 }
 
-func (rc *RedisCache) SetAccount(token string, account *Account) error {
+func (rc *Redis) SetAccount(token string, account *Account) error {
 	buf, err := json.Marshal(account)
 	if err != nil {
 		return err
@@ -101,11 +101,11 @@ func (rc *RedisCache) SetAccount(token string, account *Account) error {
 	return rc.client.Set(token, buf, rc.option.TokenExpiration).Err()
 }
 
-func (rc *RedisCache) DelAccount(token string) error {
+func (rc *Redis) DelAccount(token string) error {
 	return rc.client.Del(token).Err()
 }
 
-func (rc *RedisCache) GetAccount(token string) (*Account, error) {
+func (rc *Redis) GetAccount(token string) (*Account, error) {
 	buf, err := rc.client.Get(token).Result()
 	if err == redis.Nil {
 		return nil, nil

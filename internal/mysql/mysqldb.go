@@ -1,4 +1,4 @@
-package mysqldb
+package mysql
 
 import (
 	"github.com/jinzhu/gorm"
@@ -6,13 +6,13 @@ import (
 	"time"
 )
 
-// MysqlDB db
-type MysqlDB struct {
+// Mysql db
+type Mysql struct {
 	db *gorm.DB
 }
 
-// NewMysqlDB create a db
-func NewMysqlDB(uri string) (*MysqlDB, error) {
+// NewMysql create a db
+func NewMysql(uri string) (*Mysql, error) {
 	db, err := gorm.Open("mysql", uri)
 	if err != nil {
 		return nil, err
@@ -29,7 +29,7 @@ func NewMysqlDB(uri string) (*MysqlDB, error) {
 	// https://github.com/jinzhu/gorm/issues/1822
 	db.DB().SetConnMaxLifetime(60 * time.Second)
 
-	return &MysqlDB{
+	return &Mysql{
 		db: db,
 	}, nil
 }

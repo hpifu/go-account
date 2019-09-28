@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/hpifu/go-account/internal/c"
-	"github.com/hpifu/go-account/internal/mysqldb"
+	"github.com/hpifu/go-account/internal/mysql"
 	"github.com/hpifu/go-account/internal/rule"
 	"net/http"
 	"time"
@@ -38,7 +38,7 @@ func (s *Service) POSTAccount(c *gin.Context) (interface{}, interface{}, int, er
 	}
 
 	birthday, _ := time.Parse("2006-01-02", req.Birthday)
-	ok, err := s.db.InsertAccount(&mysqldb.Account{
+	ok, err := s.db.InsertAccount(&mysql.Account{
 		Phone:     req.Phone,
 		Email:     req.Email,
 		Password:  req.Password,

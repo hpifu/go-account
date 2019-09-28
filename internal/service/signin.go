@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hpifu/go-account/internal/rediscache"
+	"github.com/hpifu/go-account/internal/redis"
 	"github.com/hpifu/go-account/internal/rule"
 )
 
@@ -37,7 +37,7 @@ func (s *Service) SignIn(c *gin.Context) (interface{}, interface{}, int, error) 
 	}
 
 	token := NewToken()
-	if err := s.cache.SetAccount(token, rediscache.NewAccount(account)); err != nil {
+	if err := s.cache.SetAccount(token, redis.NewAccount(account)); err != nil {
 		return req, nil, http.StatusInternalServerError, fmt.Errorf("redis set account falied. err: [%v]", err)
 	}
 

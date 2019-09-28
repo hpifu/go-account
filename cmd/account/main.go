@@ -9,8 +9,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hpifu/go-account/internal/logger"
 	"github.com/hpifu/go-account/internal/mail"
-	"github.com/hpifu/go-account/internal/mysqldb"
-	"github.com/hpifu/go-account/internal/rediscache"
+	"github.com/hpifu/go-account/internal/mysql"
+	"github.com/hpifu/go-account/internal/redis"
 	"github.com/hpifu/go-account/internal/service"
 	"github.com/spf13/viper"
 )
@@ -61,14 +61,14 @@ func main() {
 	service.AccessLog = accessLog
 
 	// init mysqldb
-	db, err := mysqldb.NewMysqlDB(config.GetString("mysqldb.uri"))
+	db, err := mysql.NewMysql(config.GetString("mysqldb.uri"))
 	if err != nil {
 		panic(err)
 	}
 	infoLog.Infof("init mysqldb success. uri [%v]", config.GetString("mysqldb.uri"))
 
 	// init redis cache
-	option := &rediscache.Option{
+	option := &redis.Option{
 		Address:            config.GetString("rediscache.address"),
 		Timeout:            config.GetDuration("rediscache.timeout"),
 		Retries:            config.GetInt("rediscache.retries"),
@@ -78,7 +78,7 @@ func main() {
 		TokenExpiration:    config.GetDuration("rediscache.tokenExpiration"),
 		AuthCodeExpiration: config.GetDuration("rediscache.authCodeExpiration"),
 	}
-	cache, err := rediscache.NewRedisCache(option)
+	cache, err := redis.NewRedis(option)
 	if err != nil {
 		panic(err)
 	}

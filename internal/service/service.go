@@ -8,8 +8,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/hpifu/go-account/internal/mail"
-	"github.com/hpifu/go-account/internal/mysqldb"
-	"github.com/hpifu/go-account/internal/rediscache"
+	"github.com/hpifu/go-account/internal/mysql"
+	"github.com/hpifu/go-account/internal/redis"
 	"github.com/sirupsen/logrus"
 )
 
@@ -24,16 +24,16 @@ func init() {
 }
 
 type Service struct {
-	db     *mysqldb.MysqlDB
-	cache  *rediscache.RedisCache
+	db     *mysql.Mysql
+	cache  *redis.Redis
 	mc     *mail.MailClient
 	secure bool
 	domain string
 }
 
 func NewService(
-	db *mysqldb.MysqlDB,
-	cache *rediscache.RedisCache,
+	db *mysql.Mysql,
+	cache *redis.Redis,
 	mc *mail.MailClient,
 	secure bool,
 	domain string,
