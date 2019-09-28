@@ -12,7 +12,7 @@ all: third vendor output test stat
 
 .PHONY: deploy
 deploy:
-	mkdir -p /var/docker/account/log
+	mkdir -p /var/docker/${repository}/log
 	docker stack deploy -c stack.yml ${repository}
 
 .PHONY: remove
@@ -60,9 +60,10 @@ image: buildenv
 	docker cp . go-build-env:/data/src/${gituser}/${repository}
 	docker exec -i go-build-env bash -c "cd /data/src/${gituser}/${repository} && make output"
 	mkdir -p docker/
-	docker cp go-build-env:/data/src/${gituser}/${repository}/output/${binary} docker/
+	docker cp go-build-env:/data/src/${gituser}/${repository}/output/${repository} docker/
 	docker build --tag=hatlonely/${repository}:${version} .
-	sed 's/image: ${dockeruser}\/${repository}:.*$$/image: ${dockeruser}\/${repository}:${version}/g' stack.tpl.yml > stack.yml
+	sed 's/\${version}/${version}/g' stack.tpl.yml > stack.yml
+	sed 's/\${repository}/${repository}/g' stack.tpl.yml > stack.yml
 
 .PHONY: dockertest
 dockertest: buildenv
@@ -81,9 +82,9 @@ dockerbehave: buildenv
 output: cmd/*/*.go internal/*/*.go scripts/version.sh Makefile vendor
 	@echo "compile"
 	@go build -ldflags "-X 'main.AppVersion=`sh scripts/version.sh`'" cmd/${binary}/main.go && \
-	mkdir -p output/${binary}/bin && mv main output/${binary}/bin/${binary} && \
-	mkdir -p output/${binary}/configs && cp configs/${binary}/* output/${binary}/configs && \
-	mkdir -p output/${binary}/log
+	mkdir -p output/${repository}/bin && mv main output/${repository}/bin/${binary} && \
+	mkdir -p output/${repository}/configs && cp configs/${binary}/* output/${repository}/configs && \
+	mkdir -p output/${repository}/log
 
 vendor: go.mod go.sum
 	@echo "install golang dependency"
