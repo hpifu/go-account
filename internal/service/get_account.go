@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/hpifu/go-account/internal/rule"
-	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -14,79 +13,26 @@ type GETAccountReq struct {
 
 type GETAccountRes Account
 
-func (s *Service) GETAccount(c *gin.Context) {
-	rid := c.DefaultQuery("rid", NewToken())
+func (s* Service) GETAccount(c *gin.Context) (interface{}, interface{}, int, error) {
 	req := &GETAccountReq{}
-	var res *GETAccountRes
-	var err error
-	status := http.StatusOK
-
-	defer func() {
-		AccessLog.WithFields(logrus.Fields{
-			"host":   c.Request.Host,
-			"url":    c.Request.URL.String(),
-			"req":    req,
-			"res":    res,
-			"rid":    rid,
-			"err":    err,
-			"status": status,
-		}).Info()
-	}()
 
 	if err := c.BindUri(req); err != nil {
-		err = fmt.Errorf("bind failed. err: [%v]", err)
-		WarnLog.WithField("@rid", rid).WithField("err", err).Warn()
-		status = http.StatusBadRequest
-		c.String(status, err.Error())
-		return
+		return nil, nil, http.StatusBadRequest, fmt.Errorf("bind uri failed. err: [%v]", err)
 	}
 
-	if err = s.validGETAccountReq(req); err != nil {
-		err = fmt.Errorf("check request body failed. err: [%v]", err)
-		WarnLog.WithField("@rid", rid).WithField("err", err).Warn()
-		status = http.StatusBadRequest
-		c.String(status, err.Error())
-		return
+	if err := s.validGETAccount(req); err != nil {
+		return req, nil, http.StatusBadRequest, fmt.Errorf("valid request failed. err: [%v]", err)
 	}
 
-	res, err = s.getAccount(req)
-	if err != nil {
-		WarnLog.WithField("@rid", rid).WithField("err", err).Warn("getAccount failed")
-		status = http.StatusInternalServerError
-		c.String(status, err.Error())
-		return
-	}
-
-	if res == nil {
-		status = http.StatusNoContent
-		c.Status(status)
-		return
-	}
-
-	status = http.StatusOK
-	c.JSON(status, res)
-}
-
-func (s *Service) validGETAccountReq(req *GETAccountReq) error {
-	if err := rule.Check(map[interface{}][]rule.Rule{
-		req.Token: {rule.Required},
-	}); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (s *Service) getAccount(req *GETAccountReq) (*GETAccountRes, error) {
 	account, err := s.cache.GetAccount(req.Token)
 	if err != nil {
-		return nil, err
+		return req, nil, http.StatusInternalServerError, fmt.Errorf("redis get account failed. err: [%v]", err)
 	}
 	if account == nil {
-		return nil, nil
+		return req, nil, http.StatusNoContent, nil
 	}
 
-	return &GETAccountRes{
+	return req, &GETAccountRes{
 		ID:        account.ID,
 		Email:     account.Email,
 		Phone:     account.Phone,
@@ -95,5 +41,15 @@ func (s *Service) getAccount(req *GETAccountReq) (*GETAccountRes, error) {
 		Birthday:  account.Birthday,
 		Gender:    account.Gender,
 		Avatar:    account.Avatar,
-	}, nil
+	}, http.StatusOK, nil
+}
+
+func (s *Service) validGETAccount(req *GETAccountReq) error {
+	if err := rule.Check(map[interface{}][]rule.Rule{
+		req.Token: {rule.Required},
+	}); err != nil {
+		return err
+	}
+
+	return nil
 }
