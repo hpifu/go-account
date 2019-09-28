@@ -6,7 +6,6 @@ import (
 	"github.com/hpifu/go-account/internal/c"
 	"github.com/hpifu/go-account/internal/mysqldb"
 	"github.com/hpifu/go-account/internal/rule"
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"time"
 )
@@ -27,58 +26,39 @@ type POSTAccountReq Account
 
 type POSTAccountRes struct{}
 
-func (s *Service) POSTAccount(c *gin.Context) {
-	rid := c.DefaultQuery("rid", NewToken())
+func (s *Service) POSTAccount(c *gin.Context) (interface{}, interface{}, int, error) {
 	req := &POSTAccountReq{}
-	var err error
-	status := http.StatusOK
-
-	defer func() {
-		AccessLog.WithFields(logrus.Fields{
-			"host":   c.Request.Host,
-			"url":    c.Request.URL.String(),
-			"req":    req,
-			"res":    nil,
-			"rid":    rid,
-			"err":    err,
-			"status": status,
-		}).Info()
-	}()
 
 	if err := c.Bind(req); err != nil {
-		err = fmt.Errorf("bind failed. err: [%v]", err)
-		WarnLog.WithField("@rid", rid).WithField("err", err).Warn()
-		status = http.StatusBadRequest
-		c.String(status, err.Error())
-		return
+		return nil, nil, http.StatusBadRequest, fmt.Errorf("bind failed. err: [%v]", err)
 	}
 
-	if err = s.checkPOSTAccountReqBody(req); err != nil {
-		err = fmt.Errorf("check request body failed. req: [%v], err: [%v]", req, err)
-		WarnLog.WithField("@rid", rid).WithField("err", err).Warn()
-		status = http.StatusBadRequest
-		c.String(status, err.Error())
-		return
+	if err := s.validPOSTAccount(req); err != nil {
+		return req, nil, http.StatusBadRequest, fmt.Errorf("valid request failed. err: [%v]", err)
 	}
 
-	ok, err := s.postAccount(req)
+	birthday, _ := time.Parse("2006-01-02", req.Birthday)
+	ok, err := s.db.InsertAccount(&mysqldb.Account{
+		Phone:     req.Phone,
+		Email:     req.Email,
+		Password:  req.Password,
+		FirstName: req.FirstName,
+		LastName:  req.LastName,
+		Birthday:  birthday,
+		Gender:    req.Gender,
+	})
+
 	if err != nil {
-		err = fmt.Errorf("postAccount failed. err: [%v]", err)
-		WarnLog.WithField("@rid", rid).WithField("err", err).Warn()
-		status = http.StatusInternalServerError
-		c.String(status, err.Error())
-		return
+		return req, nil, http.StatusInternalServerError, fmt.Errorf("mysql insert account failed. err: [%v]", err)
 	}
 
 	if !ok {
-		status = http.StatusNotModified
-	} else {
-		status = http.StatusCreated
+		return req, nil, http.StatusNotModified, nil
 	}
-	c.Status(status)
+	return req, nil, http.StatusCreated, nil
 }
 
-func (s *Service) checkPOSTAccountReqBody(req *POSTAccountReq) error {
+func (s *Service) validPOSTAccount(req *POSTAccountReq) error {
 	if err := rule.Check(map[interface{}][]rule.Rule{
 		req.Password: {rule.Required, rule.AtLeast8Characters},
 		req.Gender: {rule.In(map[interface{}]struct{}{
@@ -125,19 +105,4 @@ func (s *Service) checkPOSTAccountReqBody(req *POSTAccountReq) error {
 	}
 
 	return nil
-}
-
-func (s *Service) postAccount(req *POSTAccountReq) (bool, error) {
-	birthday, _ := time.Parse("2006-01-02", req.Birthday)
-	ok, err := s.db.InsertAccount(&mysqldb.Account{
-		Phone:     req.Phone,
-		Email:     req.Email,
-		Password:  req.Password,
-		FirstName: req.FirstName,
-		LastName:  req.LastName,
-		Birthday:  birthday,
-		Gender:    req.Gender,
-	})
-
-	return ok, err
 }

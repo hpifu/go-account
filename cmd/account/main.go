@@ -120,9 +120,9 @@ func main() {
 		ctx.String(200, "ok")
 	})
 
-	r.POST("/account", svr2.POSTAccount)
+	r.POST("/account", service.Decorator(svr2.POSTAccount))
 	r.GET("/account/:token", service.Decorator(svr2.GETAccount))
-	r.PUT("/account/:token/:field", svr2.PUTAccount)
+	r.PUT("/account/:token/:field", service.Decorator(svr2.PUTAccount))
 	r.POST("/authcode/:type", svr2.POSTAuthCode)
 	r.GET("/verify/authcode/:type", svr2.VerifyAuthCode)
 	r.GET("/verify/account", svr2.VerifyAccount)

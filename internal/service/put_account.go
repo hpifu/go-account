@@ -5,7 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hpifu/go-account/internal/c"
 	"github.com/hpifu/go-account/internal/rule"
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"time"
 )
@@ -26,67 +25,72 @@ type PUTAccountReq struct {
 
 type PUTAccountRes string
 
-func (s *Service) PUTAccount(c *gin.Context) {
-	rid := c.DefaultQuery("rid", NewToken())
+func (s *Service) PUTAccount(c *gin.Context) (interface{}, interface{}, int, error) {
 	req := &PUTAccountReq{}
-	var res PUTAccountRes
-	var err error
-	status := http.StatusOK
-
-	defer func() {
-		AccessLog.WithFields(logrus.Fields{
-			"host":   c.Request.Host,
-			"url":    c.Request.URL.String(),
-			"req":    req,
-			"res":    res,
-			"rid":    rid,
-			"err":    err,
-			"status": status,
-		}).Info()
-	}()
 
 	if err := c.BindUri(req); err != nil {
-		err = fmt.Errorf("bind failed. err: [%v]", err)
-		WarnLog.WithField("@rid", rid).WithField("err", err).Warn()
-		status = http.StatusBadRequest
-		c.String(status, err.Error())
-		return
+		return nil, nil, http.StatusBadRequest, fmt.Errorf("bind uri failed. err: [%v]", err)
 	}
 
 	if err := c.Bind(req); err != nil {
-		err = fmt.Errorf("bind json failed. err: [%v]", err)
-		WarnLog.WithField("@rid", rid).WithField("err", err).Warn()
-		status = http.StatusBadRequest
-		c.String(status, err.Error())
-		return
+		return nil, nil, http.StatusBadRequest, fmt.Errorf("bind failed. err: [%v]", err)
 	}
 
-	if err = s.checkPUTAccountReqBody(req); err != nil {
-		err = fmt.Errorf("check request body failed. err: [%v]", err)
-		WarnLog.WithField("@rid", rid).WithField("err", err).Warn()
-		status = http.StatusBadRequest
-		c.String(status, err.Error())
-		return
+	if err := s.validPUTAccount(req); err != nil {
+		return req, nil, http.StatusBadRequest, fmt.Errorf("valid request failed. err: [%v]", err)
 	}
 
-	res, err = s.putAccount(req)
+	account, err := s.cache.GetAccount(req.Token)
 	if err != nil {
-		WarnLog.WithField("@rid", rid).WithField("err", err).Warn("putAccount failed")
-		status = http.StatusInternalServerError
-		c.String(status, err.Error())
-		return
+		return req, nil, http.StatusInternalServerError, fmt.Errorf("redis get account failed. err: [%v]", err)
 	}
-	if res != "" {
-		status = http.StatusOK
-		c.String(status, string(res))
-		return
+	if account == nil {
+		return req, "会话已过期，请重新登录", http.StatusOK, nil
 	}
 
-	status = http.StatusAccepted
-	c.Status(status)
+	switch req.Field {
+	case "phone":
+		_, err = s.db.UpdateAccountPhone(account.ID, req.Phone)
+		account.Phone = req.Phone
+	case "email":
+		_, err = s.db.UpdateAccountEmail(account.ID, req.Email)
+		account.Email = req.Email
+	case "password":
+		if req.OldPassword != account.Password {
+			return req, "密码错误", http.StatusOK, nil
+		}
+		_, err = s.db.UpdateAccountPassword(account.ID, req.Password)
+		account.Password = req.Password
+	case "gender":
+		_, err = s.db.UpdateAccountGender(account.ID, req.Gender)
+		account.Gender = req.Gender
+	case "name":
+		_, err = s.db.UpdateAccountName(account.ID, req.FirstName, req.LastName)
+		account.FirstName = req.FirstName
+		account.LastName = req.LastName
+	case "birthday":
+		birthday, _ := time.Parse("2006-01-02", req.Birthday)
+		_, err = s.db.UpdateAccountBirthday(account.ID, birthday)
+		account.Birthday = req.Birthday
+	case "avatar":
+		_, err = s.db.UpdateAccountAvatar(account.ID, req.Avatar)
+		account.Avatar = req.Avatar
+	default:
+		return req, PUTAccountRes(fmt.Sprintf("未知字段 [%v]", req.Field)), http.StatusOK, nil
+	}
+
+	if err != nil {
+		return req, nil, http.StatusInternalServerError, fmt.Errorf("mysql update account failed. err: [%v]", err)
+	}
+
+	if err := s.cache.SetAccount(req.Token, account); err != nil {
+		return req, nil, http.StatusInternalServerError, fmt.Errorf("redis set account failed. err: [%v]", err)
+	}
+
+	return req, nil, http.StatusAccepted, nil
 }
 
-func (s *Service) checkPUTAccountReqBody(req *PUTAccountReq) error {
+func (s *Service) validPUTAccount(req *PUTAccountReq) error {
 	if err := rule.Check(map[interface{}][]rule.Rule{
 		req.Token: {rule.Required},
 		req.Field: {rule.Required, rule.In(map[interface{}]struct{}{
@@ -132,56 +136,4 @@ func (s *Service) checkPUTAccountReqBody(req *PUTAccountReq) error {
 	default:
 		return fmt.Errorf("未知字段 [%v]", req.Field)
 	}
-}
-
-func (s *Service) putAccount(req *PUTAccountReq) (PUTAccountRes, error) {
-	account, err := s.cache.GetAccount(req.Token)
-	if err != nil {
-		return "", err
-	}
-
-	if account == nil {
-		return "会话已过期，请重新登录", nil
-	}
-
-	switch req.Field {
-	case "phone":
-		_, err = s.db.UpdateAccountPhone(account.ID, req.Phone)
-		account.Phone = req.Phone
-	case "email":
-		_, err = s.db.UpdateAccountEmail(account.ID, req.Email)
-		account.Email = req.Email
-	case "password":
-		if req.OldPassword != account.Password {
-			return "密码错误", nil
-		}
-		_, err = s.db.UpdateAccountPassword(account.ID, req.Password)
-		account.Password = req.Password
-	case "gender":
-		_, err = s.db.UpdateAccountGender(account.ID, req.Gender)
-		account.Gender = req.Gender
-	case "name":
-		_, err = s.db.UpdateAccountName(account.ID, req.FirstName, req.LastName)
-		account.FirstName = req.FirstName
-		account.LastName = req.LastName
-	case "birthday":
-		birthday, _ := time.Parse("2006-01-02", req.Birthday)
-		_, err = s.db.UpdateAccountBirthday(account.ID, birthday)
-		account.Birthday = req.Birthday
-	case "avatar":
-		_, err = s.db.UpdateAccountAvatar(account.ID, req.Avatar)
-		account.Avatar = req.Avatar
-	default:
-		return PUTAccountRes(fmt.Sprintf("未知字段 [%v]", req.Field)), nil
-	}
-
-	if err != nil {
-		return "", err
-	}
-
-	if err := s.cache.SetAccount(req.Token, account); err != nil {
-		return "", err
-	}
-
-	return "", nil
 }
