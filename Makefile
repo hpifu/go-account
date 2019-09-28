@@ -62,8 +62,7 @@ image: buildenv
 	mkdir -p docker/
 	docker cp go-build-env:/data/src/${gituser}/${repository}/output/${repository} docker/
 	docker build --tag=hatlonely/${repository}:${version} .
-	sed 's/\${version}/${version}/g' stack.tpl.yml > stack.yml
-	sed 's/\${repository}/${repository}/g' stack.tpl.yml > stack.yml
+	cat stack.tpl.yml | sed 's/\$${version}/${version}/g' | sed 's/\$${repository}/${repository}/g' > stack.yml
 
 .PHONY: dockertest
 dockertest: buildenv
