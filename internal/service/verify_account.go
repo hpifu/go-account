@@ -6,66 +6,63 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/hpifu/go-account/internal/rule"
-	"github.com/sirupsen/logrus"
 )
 
 type VerifyAccountReq struct {
 	Field string `json:"field,omitempty" form:"field"`
-	Value string `json:"value,omitempty" form:"value"`
+	Value string `json:"value,omitempty"  form:"value"`
 }
 
 type VerifyAccountRes string
 
-func (s *Service) VerifyAccount(c *gin.Context) {
-	rid := c.DefaultQuery("rid", NewToken())
+func (s *Service) VerifyAccount(c *gin.Context) (interface{}, interface{}, int, error) {
 	req := &VerifyAccountReq{}
-	var res VerifyAccountRes
-	var err error
-	var buf []byte
-	status := http.StatusOK
-
-	defer func() {
-		AccessLog.WithFields(logrus.Fields{
-			"host":   c.Request.Host,
-			"body":   string(buf),
-			"url":    c.Request.URL.String(),
-			"req":    req,
-			"res":    res,
-			"rid":    rid,
-			"err":    err,
-			"status": status,
-		}).Info()
-	}()
 
 	if err := c.Bind(req); err != nil {
-		err = fmt.Errorf("bind json failed. err: [%v]", err)
-		WarnLog.WithField("@rid", rid).WithField("err", err).Warn()
-		status = http.StatusBadRequest
-		c.String(status, err.Error())
-		return
+		return nil, nil, http.StatusBadRequest, fmt.Errorf("bind failed. err: [%v]", err)
 	}
 
-	if err = s.checkGETAccountVerifyReqBody(req); err != nil {
-		err = fmt.Errorf("check request body failed. body: [%v], err: [%v]", string(buf), err)
-		WarnLog.WithField("@rid", rid).WithField("err", err).Warn()
-		status = http.StatusBadRequest
-		c.String(status, err.Error())
-		return
+	if err := s.validVerifyAccount(req); err != nil {
+		return req, nil, http.StatusBadRequest, fmt.Errorf("valid request failed. err: [%v]", err)
 	}
 
-	res, err = s.verifyAccount(req)
-	if err != nil {
-		WarnLog.WithField("@rid", rid).WithField("err", err).Warn("verifyAccount failed")
-		status = http.StatusInternalServerError
-		c.String(status, err.Error())
-		return
+	if req.Field == "phone" {
+		account, err := s.db.SelectAccountByPhone(req.Value)
+		if err != nil {
+			return req, nil, http.StatusInternalServerError, fmt.Errorf("mysql select account failed. err: [%v]", err)
+		}
+		if account == nil {
+			return req, nil, http.StatusOK, nil
+		}
+		return req, "电话号码已存在", http.StatusOK, nil
 	}
 
-	status = http.StatusOK
-	c.String(status, string(res))
+	if req.Field == "email" {
+		account, err := s.db.SelectAccountByEmail(req.Value)
+		if err != nil {
+			return req, nil, http.StatusInternalServerError, fmt.Errorf("mysql select account failed. err: [%v]", err)
+		}
+		if account == nil {
+			return req, nil, http.StatusOK, nil
+		}
+		return req, "邮箱已存在", http.StatusOK, nil
+	}
+
+	if req.Field == "username" {
+		account, err := s.db.SelectAccountByPhoneOrEmail(req.Value)
+		if err != nil {
+			return req, nil, http.StatusInternalServerError, fmt.Errorf("mysql select account failed. err: [%v]", err)
+		}
+		if account != nil {
+			return req, nil, http.StatusOK, nil
+		}
+		return req, "账号不存在", http.StatusOK, nil
+	}
+
+	return req, VerifyAccountRes(fmt.Sprintf("未知字段 [%v]", req.Field)), http.StatusOK, nil
 }
 
-func (s *Service) checkGETAccountVerifyReqBody(req *VerifyAccountReq) error {
+func (s *Service) validVerifyAccount(req *VerifyAccountReq) error {
 	if err := rule.Check(map[interface{}][]rule.Rule{
 		req.Field: {rule.Required, rule.In(map[interface{}]struct{}{"phone": {}, "email": {}, "username": {}})},
 		req.Value: {rule.Required},
@@ -74,41 +71,4 @@ func (s *Service) checkGETAccountVerifyReqBody(req *VerifyAccountReq) error {
 	}
 
 	return nil
-}
-
-func (s *Service) verifyAccount(req *VerifyAccountReq) (VerifyAccountRes, error) {
-	if req.Field == "phone" {
-		account, err := s.db.SelectAccountByPhone(req.Value)
-		if err != nil {
-			return "", err
-		}
-		if account == nil {
-			return "", nil
-		}
-		return "电话号码已存在", nil
-	}
-
-	if req.Field == "email" {
-		account, err := s.db.SelectAccountByEmail(req.Value)
-		if err != nil {
-			return "", err
-		}
-		if account == nil {
-			return "", nil
-		}
-		return "邮箱已存在", nil
-	}
-
-	if req.Field == "username" {
-		account, err := s.db.SelectAccountByPhoneOrEmail(req.Value)
-		if err != nil {
-			return "", err
-		}
-		if account == nil {
-			return "账号不存在", nil
-		}
-		return "", nil
-	}
-
-	return VerifyAccountRes(fmt.Sprintf("未知字段 [%v]", req.Field)), nil
 }
