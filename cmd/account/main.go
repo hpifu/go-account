@@ -95,7 +95,7 @@ func main() {
 	domain := config.GetString("service.cookieDomain")
 	origin := config.GetString("service.allowOrigin")
 	// init services
-	svr2 := service.NewService(db, cache, mc, secure, domain)
+	svc := service.NewService(db, cache, mc, secure, domain)
 
 	// init gin
 	gin.SetMode(gin.ReleaseMode)
@@ -120,14 +120,14 @@ func main() {
 		ctx.String(200, "ok")
 	})
 
-	r.POST("/account", service.Decorator(svr2.POSTAccount))
-	r.GET("/account/:token", service.Decorator(svr2.GETAccount))
-	r.PUT("/account/:token/:field", service.Decorator(svr2.PUTAccount))
-	r.POST("/authcode/:type", service.Decorator(svr2.POSTAuthCode))
-	r.GET("/verify/authcode/:type", service.Decorator(svr2.VerifyAuthCode))
-	r.GET("/verify/account", service.Decorator(svr2.VerifyAccount))
-	r.GET("/signout/:token", service.Decorator(svr2.SignOut))
-	r.POST("/signin", service.Decorator(svr2.SignIn))
+	r.POST("/account", service.Decorator(svc.POSTAccount))
+	r.GET("/account/:token", service.Decorator(svc.GETAccount))
+	r.PUT("/account/:token/:field", service.Decorator(svc.PUTAccount))
+	r.POST("/authcode/:type", service.Decorator(svc.POSTAuthCode))
+	r.GET("/verify/account", service.Decorator(svc.VerifyAccount))
+	r.GET("/verify/authcode/:type", service.Decorator(svc.VerifyAuthCode))
+	r.POST("/signin", service.Decorator(svc.SignIn))
+	r.GET("/signout/:token", service.Decorator(svc.SignOut))
 
 	infoLog.Infof("%v init success, port [%v]", os.Args[0], config.GetString("service.port"))
 
