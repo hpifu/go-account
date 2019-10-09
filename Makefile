@@ -32,7 +32,7 @@ buildenv:
 		docker run --name test-redis --hostname test-redis --network testnet -d redis:5.0.5-alpine; \
 	fi
 	if [ -z "$(shell docker ps --filter name=test-mysql -q)" ]; then \
-		docker run --name test-mysql --hostname test-mysql --network testnet -e MYSQL_ROOT_PASSWORD=keaiduo1 -d hatlonely/mysql:1.0.1; \
+		docker run --name test-mysql --hostname test-mysql --network testnet -e MYSQL_ROOT_PASSWORD=keaiduo1 -d hatlonely/mysql:v1.0.1; \
 	fi
 	if [ -z "$(shell docker ps --filter name=go-build-env -q)" ]; then \
 		docker run --name go-build-env --network testnet -d hatlonely/go-env:1.0.0 tail -f /dev/null; \
