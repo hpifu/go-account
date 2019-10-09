@@ -28,7 +28,7 @@ replace (
 require (
 	github.com/gin-gonic/gin v1.4.0
 	github.com/go-redis/redis v6.15.2+incompatible
-	github.com/hpifu/go-kit v1.4.0
+	github.com/hpifu/go-kit v1.5.0
 	github.com/jinzhu/gorm v1.9.8
 	github.com/onsi/ginkgo v1.10.1 // indirect
 	github.com/onsi/gomega v1.7.0 // indirect

@@ -62,9 +62,7 @@ func (s *Service) POSTAccount(c *gin.Context) (interface{}, interface{}, int, er
 func (s *Service) validPOSTAccount(req *POSTAccountReq) error {
 	if err := rule.Check([][3]interface{}{
 		{"password", req.Password, []rule.Rule{rule.Required, rule.AtLeast8Characters}},
-		{"gender", req.Gender, []rule.Rule{rule.In(map[interface{}]struct{}{
-			c.GenderUnknown: {}, c.Male: {}, c.Famale: {},
-		})}},
+		{"gender", req.Gender, []rule.Rule{rule.In(c.GenderUnknown, c.Male, c.Famale)}},
 	}); err != nil {
 		return err
 	}

@@ -64,7 +64,7 @@ func (s *Service) VerifyAuthCode(c *gin.Context) (interface{}, interface{}, int,
 
 func (s *Service) validVerifyAuthCode(req *VerifyAuthCodeReq) error {
 	if err := rule.Check([][3]interface{}{
-		{"type", req.Type, []rule.Rule{rule.Required, rule.In(map[interface{}]struct{}{"phone": {}, "email": {}})}},
+		{"type", req.Type, []rule.Rule{rule.Required, rule.In("phone", "email")}},
 		{"code", req.Code, []rule.Rule{rule.Required, rule.ValidCode}},
 	}); err != nil {
 		return err

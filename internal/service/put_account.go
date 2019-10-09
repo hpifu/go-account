@@ -93,9 +93,9 @@ func (s *Service) PUTAccount(c *gin.Context) (interface{}, interface{}, int, err
 func (s *Service) validPUTAccount(req *PUTAccountReq) error {
 	if err := rule.Check([][3]interface{}{
 		{"token", req.Token, []rule.Rule{rule.Required}},
-		{"field", req.Field, []rule.Rule{rule.Required, rule.In(map[interface{}]struct{}{
-			"phone": {}, "email": {}, "name": {}, "birthday": {}, "gender": {}, "password": {}, "avatar": {},
-		})}},
+		{"field", req.Field, []rule.Rule{rule.Required, rule.In(
+			"phone", "email", "name", "birthday", "gender", "password", "avatar",
+		)}},
 	}); err != nil {
 		return err
 	}
@@ -114,9 +114,7 @@ func (s *Service) validPUTAccount(req *PUTAccountReq) error {
 		return rule.Check([][3]interface{}{{"birthday", req.Birthday, []rule.Rule{rule.Required, rule.ValidBirthday}}})
 	case "gender":
 		return rule.Check([][3]interface{}{
-			{"gender", req.Gender, []rule.Rule{rule.In(map[interface{}]struct{}{
-				c.GenderUnknown: {}, c.Male: {}, c.Famale: {},
-			})}},
+			{"gender", req.Gender, []rule.Rule{rule.In(c.GenderUnknown, c.Male, c.Famale)}},
 		})
 	case "password":
 		return rule.Check([][3]interface{}{

@@ -61,7 +61,7 @@ func (s *Service) POSTAuthCode(c *gin.Context) (interface{}, interface{}, int, e
 
 func (s *Service) validPOSTAuthCode(req *POSTAuthCodeReq) error {
 	if err := rule.Check([][3]interface{}{
-		{"type", req.Type, []rule.Rule{rule.Required, rule.In(map[interface{}]struct{}{"email": {}, "phone": {}})}},
+		{"type", req.Type, []rule.Rule{rule.Required, rule.In("email", "phone")}},
 		{"firstName", req.FirstName, []rule.Rule{rule.Required, rule.AtMost32Characters}},
 		{"lastName", req.LastName, []rule.Rule{rule.Required, rule.AtMost32Characters}},
 	}); err != nil {
