@@ -7,11 +7,11 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hpifu/go-kit/logger"
 	"github.com/hpifu/go-account/internal/mail"
 	"github.com/hpifu/go-account/internal/mysql"
 	"github.com/hpifu/go-account/internal/redis"
 	"github.com/hpifu/go-account/internal/service"
+	"github.com/hpifu/go-kit/logger"
 	"github.com/spf13/viper"
 )
 
@@ -74,7 +74,7 @@ func main() {
 		Retries:            config.GetInt("rediscache.retries"),
 		PoolSize:           config.GetInt("rediscache.poolSize"),
 		Password:           config.GetString("rediscache.password"),
-		DB:                 config.GetInt("rediscache.0"),
+		DB:                 config.GetInt("rediscache.db"),
 		TokenExpiration:    config.GetDuration("rediscache.tokenExpiration"),
 		AuthCodeExpiration: config.GetDuration("rediscache.authCodeExpiration"),
 	}
