@@ -12,8 +12,5 @@ Feature: POST /authcode/:type
             }
             """
         Then http 检查 201
-        Then redis get object "ac_hatlonely@foxmail.com"
-            """
-            {}
-            """
+        Then redis exist "ac_hatlonely@foxmail.com"
         Given redis del "ac_hatlonely@foxmail.com"

@@ -29,7 +29,7 @@ config = {
         "port": 3306,
         "user": "hatlonely",
         "password": "keaiduo1",
-        "db": "hads"
+        "db": "account"
     },
     "redis": {
         "host": "test-redis",
