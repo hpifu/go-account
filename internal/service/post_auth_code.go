@@ -60,25 +60,19 @@ func (s *Service) POSTAuthCode(c *gin.Context) (interface{}, interface{}, int, e
 }
 
 func (s *Service) validPOSTAuthCode(req *POSTAuthCodeReq) error {
-	if err := rule.Check(map[interface{}][]rule.Rule{
-		req.Type: {rule.Required, rule.In(map[interface{}]struct{}{
-			"email": {}, "phone": {},
-		})},
-		req.FirstName: {rule.Required, rule.AtMost32Characters},
-		req.LastName:  {rule.Required, rule.AtMost32Characters},
+	if err := rule.Check([][3]interface{}{
+		{"type", req.Type, []rule.Rule{rule.Required, rule.In(map[interface{}]struct{}{"email": {}, "phone": {}})}},
+		{"firstName", req.FirstName, []rule.Rule{rule.Required, rule.AtMost32Characters}},
+		{"lastName", req.LastName, []rule.Rule{rule.Required, rule.AtMost32Characters}},
 	}); err != nil {
 		return err
 	}
 
 	switch req.Type {
 	case "phone":
-		return rule.Check(map[interface{}][]rule.Rule{
-			req.Phone: {rule.Required, rule.ValidPhone},
-		})
+		return rule.Check([][3]interface{}{{"phone", req.Phone, []rule.Rule{rule.Required, rule.ValidPhone}}})
 	case "email":
-		return rule.Check(map[interface{}][]rule.Rule{
-			req.Email: {rule.Required, rule.ValidEmail, rule.AtMost64Characters},
-		})
+		return rule.Check([][3]interface{}{{"email", req.Email, []rule.Rule{rule.Required, rule.ValidEmail, rule.AtMost64Characters}}})
 	}
 
 	return nil

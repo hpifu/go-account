@@ -47,9 +47,9 @@ func (s *Service) SignIn(c *gin.Context) (interface{}, interface{}, int, error) 
 }
 
 func (s *Service) validSignIn(req *SignInReq) error {
-	if err := rule.Check(map[interface{}][]rule.Rule{
-		req.Username: {rule.Required},
-		req.Password: {rule.Required, rule.AtLeast8Characters},
+	if err := rule.Check([][3]interface{}{
+		{"username", req.Username, []rule.Rule{rule.Required}},
+		{"password", req.Password, []rule.Rule{rule.Required, rule.AtLeast8Characters}},
 	}); err != nil {
 		return err
 	}

@@ -60,27 +60,27 @@ func (s *Service) POSTAccount(c *gin.Context) (interface{}, interface{}, int, er
 }
 
 func (s *Service) validPOSTAccount(req *POSTAccountReq) error {
-	if err := rule.Check(map[interface{}][]rule.Rule{
-		req.Password: {rule.Required, rule.AtLeast8Characters},
-		req.Gender: {rule.In(map[interface{}]struct{}{
+	if err := rule.Check([][3]interface{}{
+		{"password", req.Password, []rule.Rule{rule.Required, rule.AtLeast8Characters}},
+		{"gender", req.Gender, []rule.Rule{rule.In(map[interface{}]struct{}{
 			c.GenderUnknown: {}, c.Male: {}, c.Famale: {},
-		})},
+		})}},
 	}); err != nil {
 		return err
 	}
 
 	if req.FirstName != "" {
-		if err := rule.AtMost32Characters(req.FirstName); err != nil {
+		if err := rule.Check([][3]interface{}{{"firstName", req.FirstName, []rule.Rule{rule.AtMost32Characters}}}); err != nil {
 			return err
 		}
 	}
 	if req.LastName != "" {
-		if err := rule.AtMost32Characters(req.LastName); err != nil {
+		if err := rule.Check([][3]interface{}{{"lastName", req.LastName, []rule.Rule{rule.AtMost32Characters}}}); err != nil {
 			return err
 		}
 	}
 	if req.Birthday != "" {
-		if err := rule.ValidBirthday(req.Birthday); err != nil {
+		if err := rule.Check([][3]interface{}{{"birthday", req.Birthday, []rule.Rule{rule.ValidBirthday}}}); err != nil {
 			return err
 		}
 	} else {
@@ -91,16 +91,12 @@ func (s *Service) validPOSTAccount(req *POSTAccountReq) error {
 		return fmt.Errorf("电话和邮箱不可同时为空")
 	}
 	if req.Phone != "" {
-		if err := rule.Check(map[interface{}][]rule.Rule{
-			req.Phone: {rule.Required, rule.ValidPhone},
-		}); err != nil {
+		if err := rule.Check([][3]interface{}{{"phone", req.Phone, []rule.Rule{rule.ValidPhone}}}); err != nil {
 			return err
 		}
 	}
 	if req.Email != "" {
-		if err := rule.Check(map[interface{}][]rule.Rule{
-			req.Email: {rule.Required, rule.ValidEmail, rule.AtMost64Characters},
-		}); err != nil {
+		if err := rule.Check([][3]interface{}{{"email", req.Email, []rule.Rule{rule.ValidEmail, rule.AtMost64Characters}}}); err != nil {
 			return err
 		}
 	}

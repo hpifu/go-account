@@ -63,9 +63,9 @@ func (s *Service) VerifyAccount(c *gin.Context) (interface{}, interface{}, int, 
 }
 
 func (s *Service) validVerifyAccount(req *VerifyAccountReq) error {
-	if err := rule.Check(map[interface{}][]rule.Rule{
-		req.Field: {rule.Required, rule.In(map[interface{}]struct{}{"phone": {}, "email": {}, "username": {}})},
-		req.Value: {rule.Required},
+	if err := rule.Check([][3]interface{}{
+		{"field", req.Field, []rule.Rule{rule.Required, rule.In(map[interface{}]struct{}{"phone": {}, "email": {}, "username": {}})}},
+		{"value", req.Value, []rule.Rule{rule.Required}},
 	}); err != nil {
 		return err
 	}

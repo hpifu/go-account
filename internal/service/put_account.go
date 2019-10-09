@@ -91,48 +91,40 @@ func (s *Service) PUTAccount(c *gin.Context) (interface{}, interface{}, int, err
 }
 
 func (s *Service) validPUTAccount(req *PUTAccountReq) error {
-	if err := rule.Check(map[interface{}][]rule.Rule{
-		req.Token: {rule.Required},
-		req.Field: {rule.Required, rule.In(map[interface{}]struct{}{
+	if err := rule.Check([][3]interface{}{
+		{"token", req.Token, []rule.Rule{rule.Required}},
+		{"field", req.Field, []rule.Rule{rule.Required, rule.In(map[interface{}]struct{}{
 			"phone": {}, "email": {}, "name": {}, "birthday": {}, "gender": {}, "password": {}, "avatar": {},
-		})},
+		})}},
 	}); err != nil {
 		return err
 	}
 
 	switch req.Field {
 	case "phone":
-		return rule.Check(map[interface{}][]rule.Rule{
-			req.Phone: {rule.Required, rule.ValidPhone},
-		})
+		return rule.Check([][3]interface{}{{"phone", req.Phone, []rule.Rule{rule.Required, rule.ValidPhone}}})
 	case "email":
-		return rule.Check(map[interface{}][]rule.Rule{
-			req.Email: {rule.Required, rule.ValidEmail, rule.AtMost64Characters},
-		})
+		return rule.Check([][3]interface{}{{"email", req.Email, []rule.Rule{rule.Required, rule.ValidEmail, rule.AtMost64Characters}}})
 	case "name":
-		return rule.Check(map[interface{}][]rule.Rule{
-			req.FirstName: {rule.Required, rule.AtMost32Characters},
-			req.LastName:  {rule.Required, rule.AtMost32Characters},
+		return rule.Check([][3]interface{}{
+			{"firstName", req.FirstName, []rule.Rule{rule.Required, rule.AtMost32Characters}},
+			{"lastName", req.LastName, []rule.Rule{rule.Required, rule.AtMost32Characters}},
 		})
 	case "birthday":
-		return rule.Check(map[interface{}][]rule.Rule{
-			req.Birthday: {rule.Required, rule.ValidBirthday},
-		})
+		return rule.Check([][3]interface{}{{"birthday", req.Birthday, []rule.Rule{rule.Required, rule.ValidBirthday}}})
 	case "gender":
-		return rule.Check(map[interface{}][]rule.Rule{
-			req.Gender: {rule.In(map[interface{}]struct{}{
+		return rule.Check([][3]interface{}{
+			{"gender", req.Gender, []rule.Rule{rule.In(map[interface{}]struct{}{
 				c.GenderUnknown: {}, c.Male: {}, c.Famale: {},
-			})},
+			})}},
 		})
 	case "password":
-		return rule.Check(map[interface{}][]rule.Rule{
-			req.Password:    {rule.Required, rule.AtLeast8Characters},
-			req.OldPassword: {rule.Required, rule.AtLeast8Characters},
+		return rule.Check([][3]interface{}{
+			{"password", req.Password, []rule.Rule{rule.Required, rule.AtLeast8Characters}},
+			{"oldPassword", req.OldPassword, []rule.Rule{rule.Required, rule.AtLeast8Characters}},
 		})
 	case "avatar":
-		return rule.Check(map[interface{}][]rule.Rule{
-			req.Avatar: {rule.Required},
-		})
+		return rule.Check([][3]interface{}{{"avatar", req.Avatar, []rule.Rule{rule.Required}}})
 	default:
 		return fmt.Errorf("未知字段 [%v]", req.Field)
 	}

@@ -33,9 +33,7 @@ func (s *Service) SignOut(c *gin.Context) (interface{}, interface{}, int, error)
 }
 
 func (s *Service) validSignOut(req *SignOutReq) error {
-	if err := rule.Check(map[interface{}][]rule.Rule{
-		req.Token: {rule.Required},
-	}); err != nil {
+	if err := rule.Check([][3]interface{}{{"token", req.Token, []rule.Rule{rule.Required}}}); err != nil {
 		return err
 	}
 

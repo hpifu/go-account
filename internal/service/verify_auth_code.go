@@ -63,22 +63,18 @@ func (s *Service) VerifyAuthCode(c *gin.Context) (interface{}, interface{}, int,
 }
 
 func (s *Service) validVerifyAuthCode(req *VerifyAuthCodeReq) error {
-	if err := rule.Check(map[interface{}][]rule.Rule{
-		req.Type: {rule.Required, rule.In(map[interface{}]struct{}{"phone": {}, "email": {}})},
-		req.Code: {rule.Required, rule.ValidCode},
+	if err := rule.Check([][3]interface{}{
+		{"type", req.Type, []rule.Rule{rule.Required, rule.In(map[interface{}]struct{}{"phone": {}, "email": {}})}},
+		{"code", req.Code, []rule.Rule{rule.Required, rule.ValidCode}},
 	}); err != nil {
 		return err
 	}
 
 	switch req.Type {
 	case "phone":
-		return rule.Check(map[interface{}][]rule.Rule{
-			req.Phone: {rule.Required, rule.ValidPhone},
-		})
+		return rule.Check([][3]interface{}{{"phone", req.Phone, []rule.Rule{rule.Required, rule.ValidPhone}}})
 	case "email":
-		return rule.Check(map[interface{}][]rule.Rule{
-			req.Email: {rule.Required, rule.ValidEmail, rule.AtMost64Characters},
-		})
+		return rule.Check([][3]interface{}{{"email", req.Email, []rule.Rule{rule.Required, rule.ValidEmail, rule.AtMost64Characters}}})
 	}
 
 	return nil
