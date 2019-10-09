@@ -55,10 +55,10 @@ cleanbuildenv:
 
 .PHONY: image
 image: buildenv
-	docker exec -i go-build-env rm -rf /data/src/${gituser}/${repository}
-	docker exec -i go-build-env mkdir -p /data/src/${gituser}/${repository}
+	docker exec go-build-env rm -rf /data/src/${gituser}/${repository}
+	docker exec go-build-env mkdir -p /data/src/${gituser}/${repository}
 	docker cp . go-build-env:/data/src/${gituser}/${repository}
-	docker exec -i go-build-env bash -c "cd /data/src/${gituser}/${repository} && make output"
+	docker exec go-build-env bash -c "cd /data/src/${gituser}/${repository} && make output"
 	mkdir -p docker/
 	docker cp go-build-env:/data/src/${gituser}/${repository}/output/${repository} docker/
 	docker build --tag=hatlonely/${repository}:${version} .
@@ -66,17 +66,17 @@ image: buildenv
 
 .PHONY: dockertest
 dockertest: buildenv
-	docker exec -i go-build-env rm -rf /data/src/${gituser}/${repository}
-	docker exec -i go-build-env mkdir -p /data/src/${gituser}/${repository}
+	docker exec go-build-env rm -rf /data/src/${gituser}/${repository}
+	docker exec go-build-env mkdir -p /data/src/${gituser}/${repository}
 	docker cp . go-build-env:/data/src/${gituser}/${repository}
-	docker exec -i go-build-env bash -c "cd /data/src/${gituser}/${repository} && make test"
+	docker exec go-build-env bash -c "cd /data/src/${gituser}/${repository} && make test"
 
 .PHONY: dockerbehave
 dockerbehave: buildenv
-	docker exec -i go-build-env rm -rf /data/src/${gituser}/${repository}
-	docker exec -i go-build-env mkdir -p /data/src/${gituser}/${repository}
+	docker exec go-build-env rm -rf /data/src/${gituser}/${repository}
+	docker exec go-build-env mkdir -p /data/src/${gituser}/${repository}
 	docker cp . go-build-env:/data/src/${gituser}/${repository}
-	docker exec -i go-build-env bash -c "cd /data/src/${gituser}/${repository} && make behave"
+	docker exec go-build-env bash -c "cd /data/src/${gituser}/${repository} && make behave"
 
 output: cmd/*/*.go internal/*/*.go scripts/version.sh Makefile vendor
 	@echo "compile"
@@ -99,7 +99,6 @@ vendor: go.mod go.sum
 test: vendor
 	@echo "Run unit tests"
 	- cd internal && go test -cover ./...
-	- cd pkg && go test -cover ./...
 
 .PHONY: behave
 behave: output
@@ -108,10 +107,10 @@ behave: output
 .PHONY: stat
 stat: cloc gocyclo
 	@echo "code statistics"
-	@cloc pkg Makefile --by-file
+	@cloc internal Makefile --by-file
 	@echo "circle complexity statistics"
-	@gocyclo pkg
-	@gocyclo pkg | awk '{sum+=$$1}END{printf("complexity: %s", sum)}'
+	@gocyclo internal
+	@gocyclo internal | awk '{sum+=$$1}END{printf("complexity: %s", sum)}'
 
 .PHONY: clean
 clean:
