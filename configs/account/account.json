@@ -6,7 +6,7 @@
         "cookieDomain": "account.hatlonely.com"
     },
     "mysqldb": {
-        "uri": "hatlonely:keaiduo1@tcp(mysql:3306)/hads?charset=utf8&parseTime=True&loc=Local"
+        "uri": "hatlonely:keaiduo1@tcp(mysql:3306)/account?charset=utf8&parseTime=True&loc=Local"
     },
     "rediscache": {
         "address": "redis:6379",
