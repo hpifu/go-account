@@ -8,7 +8,7 @@ import (
 )
 
 func TestMysqlDB_InsertAccount(t *testing.T) {
-	m, err := NewMysql("hatlonely:keaiduo1@tcp(test-mysql:3306)/hads?charset=utf8&parseTime=True&loc=Local")
+	m, err := NewMysql("hatlonely:keaiduo1@tcp(test-mysql:3306)/account?charset=utf8&parseTime=True&loc=Local")
 	Convey("test mysqldb insert account", t, func() {
 		So(err, ShouldBeNil)
 		So(m, ShouldNotBeNil)
