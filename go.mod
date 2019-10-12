@@ -30,6 +30,7 @@ require (
 	github.com/go-redis/redis v6.15.2+incompatible
 	github.com/hpifu/go-kit v1.5.0
 	github.com/jinzhu/gorm v1.9.8
+	github.com/lestrrat-go/file-rotatelogs v2.2.0+incompatible
 	github.com/onsi/ginkgo v1.10.1 // indirect
 	github.com/onsi/gomega v1.7.0 // indirect
 	github.com/sirupsen/logrus v1.4.2
