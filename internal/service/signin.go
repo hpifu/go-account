@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/hpifu/go-account/internal/redis"
+	"github.com/hpifu/go-kit/hrand"
 	"github.com/hpifu/go-kit/rule"
 )
 
@@ -36,7 +37,7 @@ func (s *Service) SignIn(c *gin.Context) (interface{}, interface{}, int, error) 
 		return req, "密码错误", http.StatusOK, nil
 	}
 
-	token := NewToken()
+	token := hrand.NewToken()
 	if err := s.cache.SetAccount(token, redis.NewAccount(account)); err != nil {
 		return req, nil, http.StatusInternalServerError, fmt.Errorf("redis set account falied. err: [%v]", err)
 	}

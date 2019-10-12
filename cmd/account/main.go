@@ -16,6 +16,7 @@ import (
 	"github.com/hpifu/go-account/internal/mysql"
 	"github.com/hpifu/go-account/internal/redis"
 	"github.com/hpifu/go-account/internal/service"
+	"github.com/hpifu/go-kit/hhttp"
 	"github.com/hpifu/go-kit/logger"
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
 	"github.com/spf13/viper"
@@ -122,18 +123,18 @@ func main() {
 	})
 
 	// set handler
+	d := hhttp.NewGinHttpDecorator(infoLog, warnLog, accessLog)
 	r.GET("/ping", func(ctx *gin.Context) {
 		ctx.String(200, "ok")
 	})
-
-	r.POST("/account", service.Decorator(svc.POSTAccount))
-	r.GET("/account/:token", service.Decorator(svc.GETAccount))
-	r.PUT("/account/:token/:field", service.Decorator(svc.PUTAccount))
-	r.POST("/authcode/:type", service.Decorator(svc.POSTAuthCode))
-	r.GET("/verify/account", service.Decorator(svc.VerifyAccount))
-	r.GET("/verify/authcode/:type", service.Decorator(svc.VerifyAuthCode))
-	r.POST("/signin", service.Decorator(svc.SignIn))
-	r.GET("/signout/:token", service.Decorator(svc.SignOut))
+	r.POST("/account", d.Decorate(svc.POSTAccount))
+	r.GET("/account/:token", d.Decorate(svc.GETAccount))
+	r.PUT("/account/:token/:field", d.Decorate(svc.PUTAccount))
+	r.POST("/authcode/:type", d.Decorate(svc.POSTAuthCode))
+	r.GET("/verify/account", d.Decorate(svc.VerifyAccount))
+	r.GET("/verify/authcode/:type", d.Decorate(svc.VerifyAuthCode))
+	r.POST("/signin", d.Decorate(svc.SignIn))
+	r.GET("/signout/:token", d.Decorate(svc.SignOut))
 
 	infoLog.Infof("%v init success, port [%v]", os.Args[0], config.GetString("service.port"))
 

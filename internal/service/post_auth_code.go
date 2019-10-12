@@ -2,10 +2,12 @@ package service
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/hpifu/go-account/internal/mail"
+	"github.com/hpifu/go-kit/hrand"
 	"github.com/hpifu/go-kit/rule"
-	"net/http"
 )
 
 type POSTAuthCodeReq struct {
@@ -38,7 +40,7 @@ func (s *Service) POSTAuthCode(c *gin.Context) (interface{}, interface{}, int, e
 		return req, nil, http.StatusInternalServerError, fmt.Errorf("redis get auth code failed. err: [%v]", err)
 	}
 	if code == "" {
-		code = NewCode()
+		code = hrand.NewAuthCode()
 	}
 
 	if req.Type == "email" {
