@@ -7,11 +7,11 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"regexp"
 	"strings"
 	"syscall"
 	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/hpifu/go-account/internal/mail"
 	"github.com/hpifu/go-account/internal/mysql"
@@ -101,7 +101,7 @@ func main() {
 
 	secure := config.GetBool("service.cookieSecure")
 	domain := config.GetString("service.cookieDomain")
-	origin := config.GetString("service.allowOrigin")
+	origins := config.GetStringSlice("service.allowOrigins")
 	// init services
 	svc := service.NewService(db, cache, mc, secure, domain)
 
@@ -109,24 +109,12 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 	r.Use(gin.Recovery())
-	pattern := regexp.MustCompile(origin)
-	r.Use(func(c *gin.Context) {
-		originHeader := c.GetHeader("Origin")
-		infoLog.Info(originHeader, origin, pattern.MatchString(originHeader))
-		if pattern.MatchString(originHeader) {
-			c.Writer.Header().Set("Access-Control-Allow-Origin", originHeader)
-		}
-		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE")
-
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(204)
-			return
-		}
-
-		c.Next()
-	})
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     origins,
+		AllowMethods:     []string{"PUT", "POST", "GET", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization", "Accept", "Cache-Control", "X-Requested-With"},
+		AllowCredentials: true,
+	}))
 
 	// set handler
 	d := hhttp.NewGinHttpDecorator(infoLog, warnLog, accessLog)

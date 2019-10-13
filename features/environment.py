@@ -21,7 +21,7 @@ config = {
     "service": {
         "port": 16060,
         "cookieSecure": False,
-        "allowOrigin": "http://127.0.0.1:4000",
+        "allowOrigins": ["http://127.0.0.1:4000"],
         "cookieDomain": "127.0.0.1"
     },
     "mysqldb": {
@@ -70,7 +70,7 @@ def deploy():
     cf["service"]["port"] = ":{}".format(config["service"]["port"])
     cf["service"]["cookieSecure"] = config["service"]["cookieSecure"]
     cf["service"]["cookieDomain"] = config["service"]["cookieDomain"]
-    cf["service"]["allowOrigin"] = config["service"]["allowOrigin"]
+    cf["service"]["allowOrigins"] = config["service"]["allowOrigins"]
     fp = open("{}/configs/account.json".format(config["prefix"]), "w")
     fp.write(json.dumps(cf, indent=4))
     fp.close()
