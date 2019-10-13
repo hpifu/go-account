@@ -3,7 +3,7 @@
         "port": ":6060",
         "allowOrigin": "https://account.hatlonely.com",
         "cookieSecure": true,
-        "cookieDomain": "account.hatlonely.com"
+        "cookieDomain": "hatlonely.com"
     },
     "mysqldb": {
         "uri": "hatlonely:keaiduo1@tcp(mysql:3306)/account?charset=utf8&parseTime=True&loc=Local"
