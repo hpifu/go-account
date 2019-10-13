@@ -111,7 +111,8 @@ func main() {
 	r.Use(gin.Recovery())
 	pattern := regexp.MustCompile(origin)
 	r.Use(func(c *gin.Context) {
-		originHeader := c.Request.Header.Get("Origin")
+		originHeader := c.GetHeader("Origin")
+		infoLog.Info(originHeader, origin, pattern.MatchString(originHeader))
 		if pattern.MatchString(originHeader) {
 			c.Writer.Header().Set("Access-Control-Allow-Origin", originHeader)
 		}
