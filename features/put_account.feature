@@ -1,4 +1,4 @@
-Feature: PUT /account/:token/:field
+Feature: PUT /account/token/:token/:field
 
     Scenario: case update phone
         Given mysql 执行
@@ -16,7 +16,7 @@ Feature: PUT /account/:token/:field
                 "id": 1
             }
             """
-        When http 请求 PUT /account/d571bda90c2d4e32a793b8a1ff4ff984/phone
+        When http 请求 PUT /account/token/d571bda90c2d4e32a793b8a1ff4ff984/phone
             """
             {
                 "json": {
@@ -59,7 +59,7 @@ Feature: PUT /account/:token/:field
                 "id": 1
             }
             """
-        When http 请求 PUT /account/d571bda90c2d4e32a793b8a1ff4ff984/email
+        When http 请求 PUT /account/token/d571bda90c2d4e32a793b8a1ff4ff984/email
             """
             {
                 "json": {
@@ -103,7 +103,7 @@ Feature: PUT /account/:token/:field
                 "id": 1
             }
             """
-        When http 请求 PUT /account/d571bda90c2d4e32a793b8a1ff4ff984/birthday
+        When http 请求 PUT /account/token/d571bda90c2d4e32a793b8a1ff4ff984/birthday
             """
             {
                 "json": {
@@ -146,7 +146,7 @@ Feature: PUT /account/:token/:field
                 "id": 1
             }
             """
-        When http 请求 PUT /account/d571bda90c2d4e32a793b8a1ff4ff984/gender
+        When http 请求 PUT /account/token/d571bda90c2d4e32a793b8a1ff4ff984/gender
             """
             {
                 "json": {
@@ -189,7 +189,7 @@ Feature: PUT /account/:token/:field
                 "id": 1
             }
             """
-        When http 请求 PUT /account/d571bda90c2d4e32a793b8a1ff4ff984/name
+        When http 请求 PUT /account/token/d571bda90c2d4e32a793b8a1ff4ff984/name
             """
             {
                 "json": {
@@ -236,7 +236,7 @@ Feature: PUT /account/:token/:field
                 "password": "12345678"
             }
             """
-        When http 请求 PUT /account/d571bda90c2d4e32a793b8a1ff4ff984/password
+        When http 请求 PUT /account/token/d571bda90c2d4e32a793b8a1ff4ff984/password
             """
             {
                 "json": {
@@ -281,7 +281,7 @@ Feature: PUT /account/:token/:field
                 "password": "12345678"
             }
             """
-        When http 请求 PUT /account/d571bda90c2d4e32a793b8a1ff4ff984/password
+        When http 请求 PUT /account/token/d571bda90c2d4e32a793b8a1ff4ff984/password
             """
             {
                 "json": {
