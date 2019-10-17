@@ -17,7 +17,7 @@ type SignInReq struct {
 
 type SignInRes string
 
-func (s *Service) SignIn(c *gin.Context) (interface{}, interface{}, int, error) {
+func (s *Service) SignIn(rid string, c *gin.Context) (interface{}, interface{}, int, error) {
 	req := &SignInReq{}
 
 	if err := c.Bind(req); err != nil {

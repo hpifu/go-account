@@ -27,7 +27,7 @@ type POSTAccountReq Account
 
 type POSTAccountRes struct{}
 
-func (s *Service) POSTAccount(c *gin.Context) (interface{}, interface{}, int, error) {
+func (s *Service) POSTAccount(rid string, c *gin.Context) (interface{}, interface{}, int, error) {
 	req := &POSTAccountReq{}
 
 	if err := c.Bind(req); err != nil {

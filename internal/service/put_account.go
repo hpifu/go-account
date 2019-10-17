@@ -25,7 +25,7 @@ type PUTAccountReq struct {
 
 type PUTAccountRes string
 
-func (s *Service) PUTAccount(c *gin.Context) (interface{}, interface{}, int, error) {
+func (s *Service) PUTAccount(rid string, c *gin.Context) (interface{}, interface{}, int, error) {
 	req := &PUTAccountReq{}
 
 	if err := c.BindUri(req); err != nil {

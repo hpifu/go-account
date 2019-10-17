@@ -15,7 +15,7 @@ type VerifyAccountReq struct {
 
 type VerifyAccountRes string
 
-func (s *Service) VerifyAccount(c *gin.Context) (interface{}, interface{}, int, error) {
+func (s *Service) VerifyAccount(rid string, c *gin.Context) (interface{}, interface{}, int, error) {
 	req := &VerifyAccountReq{}
 
 	if err := c.Bind(req); err != nil {

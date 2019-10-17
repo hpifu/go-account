@@ -3,12 +3,11 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	godtoken "github.com/hpifu/go-godtoken/api"
+	"github.com/hpifu/go-kit/rule"
 	"net/http"
 	"time"
-
-	"github.com/gin-gonic/gin"
-	"github.com/hpifu/go-kit/rule"
 )
 
 type GETAccountReq struct {
@@ -17,7 +16,7 @@ type GETAccountReq struct {
 
 type GETAccountRes Account
 
-func (s *Service) GETAccount(c *gin.Context) (interface{}, interface{}, int, error) {
+func (s *Service) GETAccount(rid string, c *gin.Context) (interface{}, interface{}, int, error) {
 	req := &GETAccountReq{}
 
 	if err := c.BindUri(req); err != nil {
@@ -35,7 +34,7 @@ func (s *Service) GETAccount(c *gin.Context) (interface{}, interface{}, int, err
 	if account == nil {
 		ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
 		defer cancel()
-		res, err := s.godtokenCli.Verify(ctx, &godtoken.VerifyReq{Token: req.Token})
+		res, err := s.godtokenCli.Verify(ctx, &godtoken.VerifyReq{Rid: rid, Token: req.Token})
 		if err != nil {
 			return req, nil, http.StatusInternalServerError, fmt.Errorf("godtoken verify failed. err: [%v]", err)
 		}

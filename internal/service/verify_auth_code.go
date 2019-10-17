@@ -16,7 +16,7 @@ type VerifyAuthCodeReq struct {
 
 type VerifyAuthCodeRes string
 
-func (s *Service) VerifyAuthCode(c *gin.Context) (interface{}, interface{}, int, error) {
+func (s *Service) VerifyAuthCode(rid string, c *gin.Context) (interface{}, interface{}, int, error) {
 	req := &VerifyAuthCodeReq{}
 
 	if err := c.BindUri(req); err != nil {

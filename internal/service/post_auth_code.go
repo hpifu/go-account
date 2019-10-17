@@ -20,7 +20,7 @@ type POSTAuthCodeReq struct {
 
 type POSTAuthCodeRes struct{}
 
-func (s *Service) POSTAuthCode(c *gin.Context) (interface{}, interface{}, int, error) {
+func (s *Service) POSTAuthCode(rid string, c *gin.Context) (interface{}, interface{}, int, error) {
 	req := &POSTAuthCodeReq{}
 
 	if err := c.BindUri(req); err != nil {

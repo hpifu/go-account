@@ -14,7 +14,7 @@ type SignOutReq struct {
 
 type SignOutRes struct{}
 
-func (s *Service) SignOut(c *gin.Context) (interface{}, interface{}, int, error) {
+func (s *Service) SignOut(rid string, c *gin.Context) (interface{}, interface{}, int, error) {
 	req := &SignOutReq{}
 
 	if err := c.BindUri(req); err != nil {
