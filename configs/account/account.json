@@ -8,13 +8,15 @@
         "cookieSecure": true,
         "cookieDomain": "hatlonely.com"
     },
-    "mysqldb": {
+    "mysql": {
         "uri": "hatlonely:keaiduo1@tcp(mysql:3306)/account?charset=utf8&parseTime=True&loc=Local"
     },
-    "rediscache": {
-        "address": "redis:6379",
-        "timeout": "20ms",
-        "retries": 3,
+    "redis": {
+        "addr": "redis:6379",
+        "dialTimeout": "20ms",
+        "readTimeout": "20ms",
+        "writeTimeout": "20ms",
+        "maxRetries": 3,
         "poolSize": 4,
         "password": "",
         "db": 0,

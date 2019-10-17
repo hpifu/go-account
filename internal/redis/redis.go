@@ -9,20 +9,11 @@ import (
 	"github.com/hpifu/pb-constant/c"
 )
 
-type Option struct {
-	Address            string
-	Timeout            time.Duration
-	Retries            int
-	PoolSize           int
-	Password           string
-	DB                 int
-	TokenExpiration    time.Duration
-	AuthCodeExpiration time.Duration
-}
-
 type Redis struct {
-	client *redis.Client
-	option *Option
+	client             *redis.Client
+	option             *redis.Options
+	authCodeExpiration time.Duration
+	tokenExpiration    time.Duration
 }
 
 type Account struct {
@@ -51,30 +42,23 @@ func NewAccount(account *mysql.Account) *Account {
 	}
 }
 
-func NewRedis(option *Option) (*Redis, error) {
-	client := redis.NewClient(&redis.Options{
-		Addr:         option.Address,
-		DialTimeout:  option.Timeout,
-		ReadTimeout:  option.Timeout,
-		WriteTimeout: option.Timeout,
-		MaxRetries:   option.Retries,
-		PoolSize:     option.PoolSize,
-		Password:     option.Password,
-		DB:           option.DB,
-	})
+func NewRedis(option *redis.Options, authCodeExpiration, tokenExpiration time.Duration) (*Redis, error) {
+	client := redis.NewClient(option)
 
 	if err := client.Ping().Err(); err != nil {
 		return nil, err
 	}
 
 	return &Redis{
-		client: client,
-		option: option,
+		client:             client,
+		option:             option,
+		authCodeExpiration: authCodeExpiration,
+		tokenExpiration:    tokenExpiration,
 	}, nil
 }
 
 func (rc *Redis) SetAuthCode(key string, code string) error {
-	return rc.client.Set("ac_"+key, code, rc.option.AuthCodeExpiration).Err()
+	return rc.client.Set("ac_"+key, code, rc.authCodeExpiration).Err()
 }
 
 func (rc *Redis) DelAuthCode(key string) error {
@@ -99,7 +83,7 @@ func (rc *Redis) SetAccount(token string, account *Account) error {
 		return err
 	}
 
-	return rc.client.Set(token, buf, rc.option.TokenExpiration).Err()
+	return rc.client.Set(token, buf, rc.tokenExpiration).Err()
 }
 
 func (rc *Redis) DelAccount(token string) error {

@@ -11,11 +11,13 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/go-redis/redis"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/hpifu/go-account/internal/mail"
 	"github.com/hpifu/go-account/internal/mysql"
-	"github.com/hpifu/go-account/internal/redis"
+	iredis "github.com/hpifu/go-account/internal/redis"
 	"github.com/hpifu/go-account/internal/service"
 	"github.com/hpifu/go-kit/hhttp"
 	"github.com/hpifu/go-kit/logger"
@@ -68,25 +70,29 @@ func main() {
 	service.WarnLog = warnLog
 	service.AccessLog = accessLog
 
-	// init mysqldb
-	db, err := mysql.NewMysql(config.GetString("mysqldb.uri"))
+	// init mysql
+	db, err := mysql.NewMysql(config.GetString("mysql.uri"))
 	if err != nil {
 		panic(err)
 	}
-	infoLog.Infof("init mysqldb success. uri [%v]", config.GetString("mysqldb.uri"))
+	infoLog.Infof("init mysql success. uri [%v]", config.GetString("mysql.uri"))
 
 	// init redis cache
-	option := &redis.Option{
-		Address:            config.GetString("rediscache.address"),
-		Timeout:            config.GetDuration("rediscache.timeout"),
-		Retries:            config.GetInt("rediscache.retries"),
-		PoolSize:           config.GetInt("rediscache.poolSize"),
-		Password:           config.GetString("rediscache.password"),
-		DB:                 config.GetInt("rediscache.db"),
-		TokenExpiration:    config.GetDuration("rediscache.tokenExpiration"),
-		AuthCodeExpiration: config.GetDuration("rediscache.authCodeExpiration"),
+	option := &redis.Options{
+		Addr:         config.GetString("redis.addr"),
+		DialTimeout:  config.GetDuration("redis.dialTimeout"),
+		ReadTimeout:  config.GetDuration("redis.readTimeout"),
+		WriteTimeout: config.GetDuration("redis.writeTimeout"),
+		MaxRetries:   config.GetInt("redis.maxRetries"),
+		PoolSize:     config.GetInt("redis.poolSize"),
+		Password:     config.GetString("redis.password"),
+		DB:           config.GetInt("redis.db"),
 	}
-	cache, err := redis.NewRedis(option)
+	cache, err := iredis.NewRedis(
+		option,
+		config.GetDuration("authCodeExpiration"),
+		config.GetDuration("tokenExpiration"),
+	)
 	if err != nil {
 		panic(err)
 	}

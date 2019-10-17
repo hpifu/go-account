@@ -24,7 +24,7 @@ config = {
         "allowOrigins": ["http://127.0.0.1:4000"],
         "cookieDomain": "127.0.0.1"
     },
-    "mysqldb": {
+    "mysql": {
         "host": "test-mysql",
         "port": 3306,
         "user": "hatlonely",
@@ -56,14 +56,14 @@ def deploy():
     fp = open("{}/configs/account.json".format(config["prefix"]))
     cf = json.loads(fp.read())
     fp.close()
-    cf["mysqldb"]["uri"] = "{user}:{password}@tcp({host}:{port})/{db}?charset=utf8&parseTime=True&loc=Local".format(
-        user=config["mysqldb"]["user"],
-        password=config["mysqldb"]["password"],
-        db=config["mysqldb"]["db"],
-        host=config["mysqldb"]["host"],
-        port=config["mysqldb"]["port"],
+    cf["mysql"]["uri"] = "{user}:{password}@tcp({host}:{port})/{db}?charset=utf8&parseTime=True&loc=Local".format(
+        user=config["mysql"]["user"],
+        password=config["mysql"]["password"],
+        db=config["mysql"]["db"],
+        host=config["mysql"]["host"],
+        port=config["mysql"]["port"],
     )
-    cf["rediscache"]["address"] = "{host}:{port}".format(
+    cf["redis"]["addr"] = "{host}:{port}".format(
         host=config["redis"]["host"],
         port=config["redis"]["port"],
     )
@@ -93,11 +93,11 @@ def stop():
 def before_all(context):
     config["url"] = "http://127.0.0.1:{}".format(config["service"]["port"])
     context.mysql_conn = pymysql.connect(
-        host=config["mysqldb"]["host"],
-        user=config["mysqldb"]["user"],
-        port=config["mysqldb"]["port"],
-        password=config["mysqldb"]["password"],
-        db=config["mysqldb"]["db"],
+        host=config["mysql"]["host"],
+        user=config["mysql"]["user"],
+        port=config["mysql"]["port"],
+        password=config["mysql"]["password"],
+        db=config["mysql"]["db"],
         charset="utf8",
         cursorclass=pymysql.cursors.DictCursor
     )
