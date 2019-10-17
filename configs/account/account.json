@@ -11,6 +11,9 @@
     "mysql": {
         "uri": "hatlonely:keaiduo1@tcp(mysql:3306)/account?charset=utf8&parseTime=True&loc=Local"
     },
+    "godtoken": {
+        "address": "go-godtoken:7060"
+    },
     "redis": {
         "addr": "redis:6379",
         "dialTimeout": "20ms",

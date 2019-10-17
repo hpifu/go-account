@@ -1,6 +1,7 @@
 package redis
 
 import (
+	goredis "github.com/go-redis/redis"
 	"testing"
 	"time"
 
@@ -8,13 +9,12 @@ import (
 )
 
 func TestRedisCache_SetGetDelAccount(t *testing.T) {
-	rc, err := NewRedis(&Option{
-		Address:         "test-redis:6379",
-		Timeout:         20 * time.Millisecond,
-		Retries:         3,
-		PoolSize:        20,
-		TokenExpiration: time.Minute,
-	})
+	rc, err := NewRedis(&goredis.Options{
+		Addr:        "test-redis:6379",
+		ReadTimeout: 20 * time.Millisecond,
+		MaxRetries:  3,
+		PoolSize:    20,
+	}, time.Minute, time.Minute)
 	Convey("test set account", t, func() {
 		So(err, ShouldBeNil)
 		So(rc, ShouldNotBeNil)

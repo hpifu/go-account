@@ -24,6 +24,9 @@ config = {
         "allowOrigins": ["http://127.0.0.1:4000"],
         "cookieDomain": "127.0.0.1"
     },
+    "godtoken": {
+        "address": "test-go-godtoken:17060"
+    },
     "mysql": {
         "host": "test-mysql",
         "port": 3306,
@@ -68,6 +71,7 @@ def deploy():
         port=config["redis"]["port"],
     )
     cf["service"]["port"] = ":{}".format(config["service"]["port"])
+    cf["godtoken"]["address"] = config["godtoken"]["address"]
     cf["service"]["cookieSecure"] = config["service"]["cookieSecure"]
     cf["service"]["cookieDomain"] = config["service"]["cookieDomain"]
     cf["service"]["allowOrigins"] = config["service"]["allowOrigins"]

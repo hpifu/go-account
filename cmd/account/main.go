@@ -11,18 +11,19 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/go-redis/redis"
-
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	goredis "github.com/go-redis/redis"
 	"github.com/hpifu/go-account/internal/mail"
 	"github.com/hpifu/go-account/internal/mysql"
-	iredis "github.com/hpifu/go-account/internal/redis"
+	"github.com/hpifu/go-account/internal/redis"
 	"github.com/hpifu/go-account/internal/service"
+	godtoken "github.com/hpifu/go-godtoken/api"
 	"github.com/hpifu/go-kit/hhttp"
 	"github.com/hpifu/go-kit/logger"
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
 	"github.com/spf13/viper"
+	"google.golang.org/grpc"
 )
 
 // AppVersion name
@@ -78,7 +79,7 @@ func main() {
 	infoLog.Infof("init mysql success. uri [%v]", config.GetString("mysql.uri"))
 
 	// init redis cache
-	option := &redis.Options{
+	option := &goredis.Options{
 		Addr:         config.GetString("redis.addr"),
 		DialTimeout:  config.GetDuration("redis.dialTimeout"),
 		ReadTimeout:  config.GetDuration("redis.readTimeout"),
@@ -88,7 +89,7 @@ func main() {
 		Password:     config.GetString("redis.password"),
 		DB:           config.GetInt("redis.db"),
 	}
-	cache, err := iredis.NewRedis(
+	cache, err := redis.NewRedis(
 		option,
 		config.GetDuration("authCodeExpiration"),
 		config.GetDuration("tokenExpiration"),
@@ -96,7 +97,18 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	infoLog.Infof("init redis cache success. option [%#v]", option)
+	infoLog.Infof("init redis success. option [%#v]", option)
+
+	// init godtoken client
+	conn, err := grpc.Dial(
+		config.GetString("godtoken.address"),
+		grpc.WithInsecure(),
+	)
+	if err != nil {
+		panic(err)
+	}
+	godtokenCli := godtoken.NewServiceClient(conn)
+	infoLog.Infof("init godtoken client success. address: [%v]", config.GetString("godtoken.address"))
 
 	// init mail client
 	mc := &mail.MailClient{}
@@ -109,7 +121,7 @@ func main() {
 	domain := config.GetString("service.cookieDomain")
 	origins := config.GetStringSlice("service.allowOrigins")
 	// init services
-	svc := service.NewService(db, cache, mc, secure, domain)
+	svc := service.NewService(db, cache, mc, &godtokenCli, secure, domain)
 
 	// init gin
 	gin.SetMode(gin.ReleaseMode)
