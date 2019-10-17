@@ -16,8 +16,11 @@ deploy:
 	docker stack deploy -c stack.yml ${repository}
 
 deploytest:
+	if [ -z "$(shell docker network ls --filter name=testnet -q)" ]; then \
+		docker network create -d bridge testnet; \
+	fi
 	if [ ! -z "$(shell docker ps --filter name=test-go-account -q)" ]; then \
-		docker stop test-go-account && docker docker rm test-go-account \
+		docker stop test-go-account && docker docker rm test-go-account; \
 	fi
 	docker run --name test-go-account --hostname test-go-account --network testnet -d \
 		-e ACCOUNT_MYSQLDB_URI="hatlonely:keaiduo1@tcp(test-mysql:3306)/hads?charset=utf8&parseTime=True&loc=Local" \
