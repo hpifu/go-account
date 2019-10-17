@@ -18,7 +18,7 @@ func (c *Client) GETAccounts(rid string, token string, ids []int) ([]*Account, e
 
 	if result.Status == http.StatusOK {
 		var res []*Account
-		if err := result.Interface(res); err != nil {
+		if err := result.Interface(&res); err != nil {
 			return nil, err
 		}
 
