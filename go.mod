@@ -31,7 +31,7 @@ require (
 	github.com/gin-gonic/gin v1.4.0
 	github.com/go-redis/redis v6.15.2+incompatible
 	github.com/hpifu/go-godtoken v1.0.2
-	github.com/hpifu/go-kit v1.6.5
+	github.com/hpifu/go-kit v1.6.6
 	github.com/hpifu/pb-constant v1.0.3
 	github.com/jinzhu/gorm v1.9.8
 	github.com/lestrrat-go/file-rotatelogs v2.2.0+incompatible

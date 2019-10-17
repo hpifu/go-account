@@ -19,8 +19,8 @@ type Account struct {
 	Avatar    string   `form:"avatar" json:"avatar"`
 }
 
-func (c *Client) GETAccountToken(token string, rid string) (*Account, error) {
-	result := c.client.GET("http://"+c.address+"/account/token/"+token, map[string]string{
+func (c *Client) GETAccountToken(rid string, token string) (*Account, error) {
+	result := c.client.GET("http://"+c.address+"/account/token/"+token, nil, map[string]interface{}{
 		"rid": rid,
 	}, nil)
 	if result.Err != nil {
