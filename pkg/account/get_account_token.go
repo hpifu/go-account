@@ -40,5 +40,5 @@ func (c *Client) GETAccountToken(rid string, token string) (*Account, error) {
 		return nil, nil
 	}
 
-	return nil, fmt.Errorf("GETAccountToken failed. res [%v]", string(result.Res))
+	return nil, fmt.Errorf("GET account/token failed. res [%v]", string(result.Res))
 }

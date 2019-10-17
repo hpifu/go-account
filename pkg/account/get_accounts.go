@@ -6,7 +6,7 @@ import (
 )
 
 func (c *Client) GETAccounts(rid string, token string, ids []int) ([]*Account, error) {
-	result := c.client.GET("http://"+c.address+"/account/token/"+token, map[string]string{
+	result := c.client.GET("http://"+c.address+"/accounts", map[string]string{
 		"Authorization": token,
 	}, map[string]interface{}{
 		"rid": rid,
@@ -29,5 +29,5 @@ func (c *Client) GETAccounts(rid string, token string, ids []int) ([]*Account, e
 		return nil, nil
 	}
 
-	return nil, fmt.Errorf("GETAccountToken failed. res [%v]", string(result.Res))
+	return nil, fmt.Errorf("GET accounts failed. res [%v]", string(result.Res))
 }
