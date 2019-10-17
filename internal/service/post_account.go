@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hpifu/go-account/internal/c"
 	"github.com/hpifu/go-account/internal/mysql"
 	"github.com/hpifu/go-kit/rule"
+	"github.com/hpifu/pb-constant/c"
 )
 
 type Account struct {
@@ -62,7 +62,7 @@ func (s *Service) POSTAccount(c *gin.Context) (interface{}, interface{}, int, er
 func (s *Service) validPOSTAccount(req *POSTAccountReq) error {
 	if err := rule.Check([][3]interface{}{
 		{"password", req.Password, []rule.Rule{rule.Required, rule.AtLeast8Characters}},
-		{"gender", req.Gender, []rule.Rule{rule.In(c.GenderUnknown, c.Male, c.Famale)}},
+		{"gender", req.Gender, []rule.Rule{rule.In(c.Gender_Null, c.Gender_Unknown, c.Gender_Male, c.Gender_Famale)}},
 	}); err != nil {
 		return err
 	}

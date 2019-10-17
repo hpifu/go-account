@@ -2,11 +2,12 @@ package mysql
 
 import (
 	"fmt"
-	"github.com/hpifu/go-account/internal/c"
-	"github.com/hpifu/go-kit/rule"
-	"github.com/jinzhu/gorm"
 	"strings"
 	"time"
+
+	"github.com/hpifu/go-kit/rule"
+	"github.com/hpifu/pb-constant/c"
+	"github.com/jinzhu/gorm"
 )
 
 type Account struct {

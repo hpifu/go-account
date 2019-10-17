@@ -2,10 +2,11 @@ package redis
 
 import (
 	"encoding/json"
-	"github.com/go-redis/redis"
-	"github.com/hpifu/go-account/internal/c"
-	"github.com/hpifu/go-account/internal/mysql"
 	"time"
+
+	"github.com/go-redis/redis"
+	"github.com/hpifu/go-account/internal/mysql"
+	"github.com/hpifu/pb-constant/c"
 )
 
 type Option struct {

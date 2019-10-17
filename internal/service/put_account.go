@@ -3,8 +3,8 @@ package service
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/hpifu/go-account/internal/c"
 	"github.com/hpifu/go-kit/rule"
+	"github.com/hpifu/pb-constant/c"
 	"net/http"
 	"time"
 )
@@ -114,7 +114,7 @@ func (s *Service) validPUTAccount(req *PUTAccountReq) error {
 		return rule.Check([][3]interface{}{{"birthday", req.Birthday, []rule.Rule{rule.Required, rule.ValidBirthday}}})
 	case "gender":
 		return rule.Check([][3]interface{}{
-			{"gender", req.Gender, []rule.Rule{rule.In(c.GenderUnknown, c.Male, c.Famale)}},
+			{"gender", req.Gender, []rule.Rule{rule.In(c.Gender_Null, c.Gender_Unknown, c.Gender_Male, c.Gender_Famale)}},
 		})
 	case "password":
 		return rule.Check([][3]interface{}{

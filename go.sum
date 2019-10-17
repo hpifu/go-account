@@ -62,6 +62,8 @@ github.com/golang/oauth2 v0.0.0-20190604053449-0f29369cfe45/go.mod h1:gOpvHmFTYa
 github.com/golang/protobuf v1.2.0/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
 github.com/golang/protobuf v1.3.1 h1:YF8+flBXS5eO826T4nzqPrxfhQThhXl0YzfuUPu4SBg=
 github.com/golang/protobuf v1.3.1/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
+github.com/golang/protobuf v1.3.2 h1:6nsPYzhq5kReh6QImI3k5qWzO4PEbvbIW2cwSfR/6xs=
+github.com/golang/protobuf v1.3.2/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
 github.com/golang/sync v0.0.0-20190423024810-112230192c58/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 github.com/golang/sys v0.0.0-20190602015325-4c4f7f33c9ed h1:BIG54Uwbp5ZzFl3i2t+d+EGE8jq89zYK7iXM6tyv76E=
 github.com/golang/sys v0.0.0-20190602015325-4c4f7f33c9ed/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
@@ -95,8 +97,10 @@ github.com/hashicorp/hcl v1.0.0/go.mod h1:E5yfLk+7swimpb2L/Alb/PJmXilQ/rhwaUYs4T
 github.com/hpcloud/tail v1.0.0 h1:nfCOvKYfkgYP8hkirhJocXT2+zOD8yUNjXaWfTlyFKI=
 github.com/hpcloud/tail v1.0.0/go.mod h1:ab1qPbhIpdTxEkNHXyeSf5vhxWSCs/tWer42PpOxQnU=
 github.com/hpifu/go-account v1.2.0/go.mod h1:qPUOaBOwRFh6KGt+Sv9xdBotatqKGDgXUCHNqzWW5KU=
-github.com/hpifu/go-kit v1.6.1 h1:gflyRBg3sEVugS9Rqp8QExx+Ya17Hsc8O6zZBa2azkY=
-github.com/hpifu/go-kit v1.6.1/go.mod h1:IQSv/sIhi4EAdbY+gDhWfP42s3suOGCd3mVwdO4htj8=
+github.com/hpifu/go-kit v1.6.3 h1:DF/jLC3EWxowXwX/bFKmF+kT9kQI7rmL3IO+ueCty/Y=
+github.com/hpifu/go-kit v1.6.3/go.mod h1:IQSv/sIhi4EAdbY+gDhWfP42s3suOGCd3mVwdO4htj8=
+github.com/hpifu/pb-constant v1.0.3 h1:CfMkPFLvP2VhAxOr9wkRxdPdsdevz7A150t8Jvfjbt4=
+github.com/hpifu/pb-constant v1.0.3/go.mod h1:gT0WB+3wHYElaDPAynJrV9CbRHRGnoE75JE/XhmotBs=
 github.com/jehiah/go-strftime v0.0.0-20171201141054-1d33003b3869 h1:IPJ3dvxmJ4uczJe5YQdrYB16oTJlGSC/OyZDqUk9xX4=
 github.com/jehiah/go-strftime v0.0.0-20171201141054-1d33003b3869/go.mod h1:cJ6Cj7dQo+O6GJNiMx+Pa94qKj+TG8ONdKHgMNIyyag=
 github.com/jinzhu/gorm v1.9.8 h1:n5uvxqLepIP2R1XF7pudpt9Rv8I3m7G9trGxJVjLZ5k=
