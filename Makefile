@@ -15,6 +15,16 @@ deploy:
 	mkdir -p /var/docker/${repository}/log
 	docker stack deploy -c stack.yml ${repository}
 
+deploytest:
+	if [ ! -z "$(shell docker ps --filter name=test-go-account -q)" ]; then \
+		docker stop test-go-account && docker docker rm test-go-account \
+	fi
+	docker run --name test-go-account --hostname test-go-account --network testnet -d \
+		-e ACCOUNT_MYSQLDB_URI="hatlonely:keaiduo1@tcp(test-mysql:3306)/hads?charset=utf8&parseTime=True&loc=Local" \
+		-e ACCOUNT_REDISCACHE_ADDRESS="test-redis:6379" \
+		-e ACCOUNT_SERVICE_PORT=":16060" \
+		${dockeruser}/${repository}:${version}
+
 .PHONY: remove
 remove:
 	docker stack rm ${repository}
