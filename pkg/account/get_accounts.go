@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func (c *Client) GETAccounts(rid string, token string, ids []int) (*Account, error) {
+func (c *Client) GETAccounts(rid string, token string, ids []int) ([]*Account, error) {
 	result := c.client.GET("http://"+c.address+"/account/token/"+token, map[string]string{
 		"Authorization": token,
 	}, map[string]interface{}{
@@ -17,7 +17,7 @@ func (c *Client) GETAccounts(rid string, token string, ids []int) (*Account, err
 	}
 
 	if result.Status == http.StatusOK {
-		res := &Account{}
+		var res []*Account
 		if err := result.Interface(res); err != nil {
 			return nil, err
 		}
