@@ -32,7 +32,7 @@ func (s *Service) VerifyAuthCode(c *gin.Context) (interface{}, interface{}, int,
 	}
 
 	if req.Type == "phone" {
-		code, err := s.cache.GetAuthCode(req.Phone)
+		code, err := s.redis.GetAuthCode(req.Phone)
 		if err != nil {
 			return req, nil, http.StatusInternalServerError, fmt.Errorf("redis get auth code failed. err: [%v]", err)
 		}
@@ -46,7 +46,7 @@ func (s *Service) VerifyAuthCode(c *gin.Context) (interface{}, interface{}, int,
 	}
 
 	if req.Type == "email" {
-		code, err := s.cache.GetAuthCode(req.Email)
+		code, err := s.redis.GetAuthCode(req.Email)
 		if err != nil {
 			return req, nil, http.StatusInternalServerError, fmt.Errorf("redis get auth code failed. err: [%v]", err)
 		}

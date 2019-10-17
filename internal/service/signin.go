@@ -38,7 +38,7 @@ func (s *Service) SignIn(c *gin.Context) (interface{}, interface{}, int, error) 
 	}
 
 	token := hrand.NewToken()
-	if err := s.cache.SetAccount(token, redis.NewAccount(account)); err != nil {
+	if err := s.redis.SetAccount(token, redis.NewAccount(account)); err != nil {
 		return req, nil, http.StatusInternalServerError, fmt.Errorf("redis set account falied. err: [%v]", err)
 	}
 

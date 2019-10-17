@@ -40,7 +40,7 @@ func (s *Service) PUTAccount(c *gin.Context) (interface{}, interface{}, int, err
 		return req, nil, http.StatusBadRequest, fmt.Errorf("valid request failed. err: [%v]", err)
 	}
 
-	account, err := s.cache.GetAccount(req.Token)
+	account, err := s.redis.GetAccount(req.Token)
 	if err != nil {
 		return req, nil, http.StatusInternalServerError, fmt.Errorf("redis get account failed. err: [%v]", err)
 	}
@@ -83,7 +83,7 @@ func (s *Service) PUTAccount(c *gin.Context) (interface{}, interface{}, int, err
 		return req, nil, http.StatusInternalServerError, fmt.Errorf("mysql update account failed. err: [%v]", err)
 	}
 
-	if err := s.cache.SetAccount(req.Token, account); err != nil {
+	if err := s.redis.SetAccount(req.Token, account); err != nil {
 		return req, nil, http.StatusInternalServerError, fmt.Errorf("redis set account failed. err: [%v]", err)
 	}
 

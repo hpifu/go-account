@@ -35,7 +35,7 @@ func (s *Service) POSTAuthCode(c *gin.Context) (interface{}, interface{}, int, e
 		return req, nil, http.StatusBadRequest, fmt.Errorf("valid request failed. err: [%v]", err)
 	}
 
-	code, err := s.cache.GetAuthCode(req.Email)
+	code, err := s.redis.GetAuthCode(req.Email)
 	if err != nil {
 		return req, nil, http.StatusInternalServerError, fmt.Errorf("redis get auth code failed. err: [%v]", err)
 	}
@@ -44,7 +44,7 @@ func (s *Service) POSTAuthCode(c *gin.Context) (interface{}, interface{}, int, e
 	}
 
 	if req.Type == "email" {
-		if err := s.cache.SetAuthCode(req.Email, code); err != nil {
+		if err := s.redis.SetAuthCode(req.Email, code); err != nil {
 			return req, nil, http.StatusInternalServerError, fmt.Errorf("redis set auth code failed. err: [%v]", err)
 		}
 		if err := s.mc.Send(req.Email, "hpifu 账号验证", mail.NewAuthCodeTpl(req.FirstName, req.LastName, code)); err != nil {
@@ -52,7 +52,7 @@ func (s *Service) POSTAuthCode(c *gin.Context) (interface{}, interface{}, int, e
 		}
 	}
 	if req.Type == "phone" {
-		if err := s.cache.SetAuthCode(req.Phone, code); err != nil {
+		if err := s.redis.SetAuthCode(req.Phone, code); err != nil {
 			return req, nil, http.StatusInternalServerError, fmt.Errorf("redis set auth code failed. err: [%v]", err)
 		}
 		// todo send auth code to phone

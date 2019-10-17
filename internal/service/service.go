@@ -14,7 +14,7 @@ var AccessLog *logrus.Logger = logrus.New()
 
 type Service struct {
 	db          *mysql.Mysql
-	cache       *redis.Redis
+	redis       *redis.Redis
 	mc          *mail.MailClient
 	godtokenCli *godtoken.ServiceClient
 	secure      bool
@@ -31,7 +31,7 @@ func NewService(
 ) *Service {
 	return &Service{
 		db:          db,
-		cache:       cache,
+		redis:       cache,
 		mc:          mc,
 		godtokenCli: godtokenCli,
 		secure:      secure,

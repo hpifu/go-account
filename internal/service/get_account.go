@@ -25,12 +25,12 @@ func (s *Service) GETAccount(c *gin.Context) (interface{}, interface{}, int, err
 		return req, nil, http.StatusBadRequest, fmt.Errorf("valid request failed. err: [%v]", err)
 	}
 
-	account, err := s.cache.GetAccount(req.Token)
+	account, err := s.redis.GetAccount(req.Token)
 	if err != nil {
 		return req, nil, http.StatusInternalServerError, fmt.Errorf("redis get account failed. err: [%v]", err)
 	}
 	if account == nil {
-		return req, nil, http.StatusNoContent, nil
+		return req, nil, http.StatusUnauthorized, nil
 	}
 
 	return req, &GETAccountRes{

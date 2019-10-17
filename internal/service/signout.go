@@ -25,7 +25,7 @@ func (s *Service) SignOut(c *gin.Context) (interface{}, interface{}, int, error)
 		return req, nil, http.StatusBadRequest, fmt.Errorf("valid request failed. err: [%v]", err)
 	}
 
-	if err := s.cache.DelAccount(req.Token); err != nil {
+	if err := s.redis.DelAccount(req.Token); err != nil {
 		return req, nil, http.StatusInternalServerError, fmt.Errorf("redis del account failed. err: [%v]", err)
 	}
 
