@@ -23,6 +23,16 @@ type Account struct {
 	Role      int       `gorm:"type:bigint(20) default 0;not null" json:"role"`
 }
 
+func (m *Mysql) SelectAccountByIDs(ids []int) ([]*Account, error) {
+	var accounts []*Account
+
+	if err := m.db.Where("id IN (?)", ids).Find(&accounts).Error; err != nil {
+		return nil, err
+	}
+
+	return accounts, nil
+}
+
 func (m *Mysql) SelectAccountByPhoneOrEmail(key string) (*Account, error) {
 	if err := rule.ValidPhone(key); err == nil {
 		return m.SelectAccountByPhone(key)

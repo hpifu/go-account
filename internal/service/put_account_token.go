@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-type PUTAccountReq struct {
+type PUTAccountTokenReq struct {
 	Token       string   `json:"token" uri:"token"`
 	Field       string   `json:"field,omitempty" uri:"field"`
 	Email       string   `json:"email,omitempty" form:"email"`
@@ -23,10 +23,10 @@ type PUTAccountReq struct {
 	Avatar      string   `json:"avatar,omitempty" form:"avatar"`
 }
 
-type PUTAccountRes string
+type PUTAccountTokenRes string
 
-func (s *Service) PUTAccount(rid string, c *gin.Context) (interface{}, interface{}, int, error) {
-	req := &PUTAccountReq{}
+func (s *Service) PUTAccountToken(rid string, c *gin.Context) (interface{}, interface{}, int, error) {
+	req := &PUTAccountTokenReq{}
 
 	if err := c.BindUri(req); err != nil {
 		return nil, nil, http.StatusBadRequest, fmt.Errorf("bind uri failed. err: [%v]", err)
@@ -36,7 +36,7 @@ func (s *Service) PUTAccount(rid string, c *gin.Context) (interface{}, interface
 		return nil, nil, http.StatusBadRequest, fmt.Errorf("bind failed. err: [%v]", err)
 	}
 
-	if err := s.validPUTAccount(req); err != nil {
+	if err := s.validPUTAccountToken(req); err != nil {
 		return req, nil, http.StatusBadRequest, fmt.Errorf("valid request failed. err: [%v]", err)
 	}
 
@@ -76,7 +76,7 @@ func (s *Service) PUTAccount(rid string, c *gin.Context) (interface{}, interface
 		_, err = s.db.UpdateAccountAvatar(account.ID, req.Avatar)
 		account.Avatar = req.Avatar
 	default:
-		return req, PUTAccountRes(fmt.Sprintf("未知字段 [%v]", req.Field)), http.StatusOK, nil
+		return req, PUTAccountTokenRes(fmt.Sprintf("未知字段 [%v]", req.Field)), http.StatusOK, nil
 	}
 
 	if err != nil {
@@ -90,7 +90,7 @@ func (s *Service) PUTAccount(rid string, c *gin.Context) (interface{}, interface
 	return req, nil, http.StatusAccepted, nil
 }
 
-func (s *Service) validPUTAccount(req *PUTAccountReq) error {
+func (s *Service) validPUTAccountToken(req *PUTAccountTokenReq) error {
 	if err := rule.Check([][3]interface{}{
 		{"token", req.Token, []rule.Rule{rule.Required}},
 		{"field", req.Field, []rule.Rule{rule.Required, rule.In(

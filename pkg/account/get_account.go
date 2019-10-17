@@ -19,8 +19,8 @@ type Account struct {
 	Avatar    string   `form:"avatar" json:"avatar"`
 }
 
-func (c *Client) GETAccount(token string, rid string) (*Account, error) {
-	result := c.client.GET("http://"+c.address+"/account/"+token, map[string]string{
+func (c *Client) GETAccountToken(token string, rid string) (*Account, error) {
+	result := c.client.GET("http://"+c.address+"/account/token/"+token, map[string]string{
 		"rid": rid,
 	}, nil)
 	if result.Err != nil {
@@ -40,5 +40,5 @@ func (c *Client) GETAccount(token string, rid string) (*Account, error) {
 		return nil, nil
 	}
 
-	return nil, fmt.Errorf("GETAccount failed. res [%v]", string(result.Res))
+	return nil, fmt.Errorf("GETAccountToken failed. res [%v]", string(result.Res))
 }

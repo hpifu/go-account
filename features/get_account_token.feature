@@ -14,10 +14,12 @@ Feature: GET /account/token/:token
         Then http 检查 200
             """
             {
-                "phone": "13112341234",
-                "email": "hatlonely@foxmail.com",
-                "firstName": "爽",
-                "lastName": "郑"
+                "json": {
+                    "phone": "13112341234",
+                    "email": "hatlonely@foxmail.com",
+                    "firstName": "爽",
+                    "lastName": "郑"
+                }
             }
             """
         Given redis del "d571bda90c2d4e32a793b8a1ff4ff984"
@@ -34,12 +36,4 @@ Feature: GET /account/token/:token
             """
         When http 请求 GET /account/token/d571bda90c2d4e32a793b8a1ff4ff983
         Then http 检查 401
-            """
-            {
-                "phone": "13112341234",
-                "email": "hatlonely@foxmail.com",
-                "firstName": "爽",
-                "lastName": "郑"
-            }
-            """
         Given redis del "d571bda90c2d4e32a793b8a1ff4ff984"

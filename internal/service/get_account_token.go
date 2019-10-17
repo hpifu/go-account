@@ -1,29 +1,26 @@
 package service
 
 import (
-	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	godtoken "github.com/hpifu/go-godtoken/api"
 	"github.com/hpifu/go-kit/rule"
 	"net/http"
-	"time"
 )
 
-type GETAccountReq struct {
+type GETAccountTokenReq struct {
 	Token string `uri:"token" json:"token,omitempty"`
 }
 
-type GETAccountRes Account
+type GETAccountTokenRes Account
 
-func (s *Service) GETAccount(rid string, c *gin.Context) (interface{}, interface{}, int, error) {
-	req := &GETAccountReq{}
+func (s *Service) GETAccountToken(rid string, c *gin.Context) (interface{}, interface{}, int, error) {
+	req := &GETAccountTokenReq{}
 
 	if err := c.BindUri(req); err != nil {
 		return nil, nil, http.StatusBadRequest, fmt.Errorf("bind uri failed. err: [%v]", err)
 	}
 
-	if err := s.validGETAccount(req); err != nil {
+	if err := s.validGETAccountToken(req); err != nil {
 		return req, nil, http.StatusBadRequest, fmt.Errorf("valid request failed. err: [%v]", err)
 	}
 
@@ -32,18 +29,10 @@ func (s *Service) GETAccount(rid string, c *gin.Context) (interface{}, interface
 		return req, nil, http.StatusInternalServerError, fmt.Errorf("redis get account failed. err: [%v]", err)
 	}
 	if account == nil {
-		ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
-		defer cancel()
-		res, err := s.godtokenCli.Verify(ctx, &godtoken.VerifyReq{Rid: rid, Token: req.Token})
-		if err != nil {
-			return req, nil, http.StatusInternalServerError, fmt.Errorf("godtoken verify failed. err: [%v]", err)
-		}
-		if !res.Ok {
-			return req, nil, http.StatusUnauthorized, nil
-		}
+		return req, nil, http.StatusUnauthorized, nil
 	}
 
-	return req, &GETAccountRes{
+	return req, &GETAccountTokenRes{
 		ID:        account.ID,
 		Email:     account.Email,
 		Phone:     account.Phone,
@@ -55,7 +44,7 @@ func (s *Service) GETAccount(rid string, c *gin.Context) (interface{}, interface
 	}, http.StatusOK, nil
 }
 
-func (s *Service) validGETAccount(req *GETAccountReq) error {
+func (s *Service) validGETAccountToken(req *GETAccountTokenReq) error {
 	if err := rule.Check([][3]interface{}{
 		{"token", req.Token, []rule.Rule{rule.Required}},
 	}); err != nil {
