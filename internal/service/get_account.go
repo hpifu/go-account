@@ -1,8 +1,11 @@
 package service
 
 import (
+	"context"
 	"fmt"
+	godtoken "github.com/hpifu/go-godtoken/api"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/hpifu/go-kit/rule"
@@ -30,7 +33,15 @@ func (s *Service) GETAccount(c *gin.Context) (interface{}, interface{}, int, err
 		return req, nil, http.StatusInternalServerError, fmt.Errorf("redis get account failed. err: [%v]", err)
 	}
 	if account == nil {
-		return req, nil, http.StatusUnauthorized, nil
+		ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
+		defer cancel()
+		res, err := s.godtokenCli.Verify(ctx, &godtoken.VerifyReq{Token: req.Token})
+		if err != nil {
+			return req, nil, http.StatusInternalServerError, fmt.Errorf("godtoken verify failed. err: [%v]", err)
+		}
+		if !res.Ok {
+			return req, nil, http.StatusUnauthorized, nil
+		}
 	}
 
 	return req, &GETAccountRes{

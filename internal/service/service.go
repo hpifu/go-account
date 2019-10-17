@@ -16,7 +16,7 @@ type Service struct {
 	db          *mysql.Mysql
 	redis       *redis.Redis
 	mc          *mail.MailClient
-	godtokenCli *godtoken.ServiceClient
+	godtokenCli godtoken.ServiceClient
 	secure      bool
 	domain      string
 }
@@ -25,7 +25,7 @@ func NewService(
 	db *mysql.Mysql,
 	cache *redis.Redis,
 	mc *mail.MailClient,
-	godtokenCli *godtoken.ServiceClient,
+	godtokenCli godtoken.ServiceClient,
 	secure bool,
 	domain string,
 ) *Service {

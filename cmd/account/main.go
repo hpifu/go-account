@@ -121,7 +121,7 @@ func main() {
 	domain := config.GetString("service.cookieDomain")
 	origins := config.GetStringSlice("service.allowOrigins")
 	// init services
-	svc := service.NewService(db, cache, mc, &godtokenCli, secure, domain)
+	svc := service.NewService(db, cache, mc, godtokenCli, secure, domain)
 
 	// init gin
 	gin.SetMode(gin.ReleaseMode)
