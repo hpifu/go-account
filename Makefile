@@ -15,6 +15,7 @@ deploy:
 	mkdir -p /var/docker/${repository}/log
 	docker stack deploy -c stack.yml ${repository}
 
+.PHONY: deploytest
 deploytest:
 	if [ -z "$(shell docker network ls --filter name=testnet -q)" ]; then \
 		docker network create -d bridge testnet; \
