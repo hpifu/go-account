@@ -13,7 +13,7 @@ var WarnLog *logrus.Logger = logrus.New()
 var AccessLog *logrus.Logger = logrus.New()
 
 type Service struct {
-	db          *mysql.Mysql
+	mysql       *mysql.Mysql
 	redis       *redis.Redis
 	mc          *mail.MailClient
 	godtokenCli godtoken.ServiceClient
@@ -30,7 +30,7 @@ func NewService(
 	domain string,
 ) *Service {
 	return &Service{
-		db:          db,
+		mysql:       db,
 		redis:       cache,
 		mc:          mc,
 		godtokenCli: godtokenCli,

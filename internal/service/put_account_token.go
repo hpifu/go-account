@@ -50,30 +50,30 @@ func (s *Service) PUTAccountToken(rid string, c *gin.Context) (interface{}, inte
 
 	switch req.Field {
 	case "phone":
-		_, err = s.db.UpdateAccountPhone(account.ID, req.Phone)
+		_, err = s.mysql.UpdateAccountPhone(account.ID, req.Phone)
 		account.Phone = req.Phone
 	case "email":
-		_, err = s.db.UpdateAccountEmail(account.ID, req.Email)
+		_, err = s.mysql.UpdateAccountEmail(account.ID, req.Email)
 		account.Email = req.Email
 	case "password":
 		if req.OldPassword != account.Password {
 			return req, "密码错误", http.StatusOK, nil
 		}
-		_, err = s.db.UpdateAccountPassword(account.ID, req.Password)
+		_, err = s.mysql.UpdateAccountPassword(account.ID, req.Password)
 		account.Password = req.Password
 	case "gender":
-		_, err = s.db.UpdateAccountGender(account.ID, req.Gender)
+		_, err = s.mysql.UpdateAccountGender(account.ID, req.Gender)
 		account.Gender = req.Gender
 	case "name":
-		_, err = s.db.UpdateAccountName(account.ID, req.FirstName, req.LastName)
+		_, err = s.mysql.UpdateAccountName(account.ID, req.FirstName, req.LastName)
 		account.FirstName = req.FirstName
 		account.LastName = req.LastName
 	case "birthday":
 		birthday, _ := time.Parse("2006-01-02", req.Birthday)
-		_, err = s.db.UpdateAccountBirthday(account.ID, birthday)
+		_, err = s.mysql.UpdateAccountBirthday(account.ID, birthday)
 		account.Birthday = req.Birthday
 	case "avatar":
-		_, err = s.db.UpdateAccountAvatar(account.ID, req.Avatar)
+		_, err = s.mysql.UpdateAccountAvatar(account.ID, req.Avatar)
 		account.Avatar = req.Avatar
 	default:
 		return req, PUTAccountTokenRes(fmt.Sprintf("未知字段 [%v]", req.Field)), http.StatusOK, nil

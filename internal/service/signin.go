@@ -28,7 +28,7 @@ func (s *Service) SignIn(rid string, c *gin.Context) (interface{}, interface{}, 
 		return req, nil, http.StatusBadRequest, fmt.Errorf("valid request failed. err: [%v]", err)
 	}
 
-	account, err := s.db.SelectAccountByPhoneOrEmail(req.Username)
+	account, err := s.mysql.SelectAccountByPhoneOrEmail(req.Username)
 	if err != nil {
 		return req, nil, http.StatusInternalServerError, fmt.Errorf("mysql select account failed. err: [%v]", err)
 	}

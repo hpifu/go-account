@@ -41,7 +41,7 @@ func (s *Service) GETAccounts(rid string, c *gin.Context) (interface{}, interfac
 		return req, nil, http.StatusUnauthorized, nil
 	}
 
-	accounts, err := s.db.SelectAccountByIDs(req.IDs)
+	accounts, err := s.mysql.SelectAccountByIDs(req.IDs)
 	if err != nil {
 		return req, nil, http.StatusInternalServerError, err
 	}

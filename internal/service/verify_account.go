@@ -27,7 +27,7 @@ func (s *Service) VerifyAccount(rid string, c *gin.Context) (interface{}, interf
 	}
 
 	if req.Field == "phone" {
-		account, err := s.db.SelectAccountByPhone(req.Value)
+		account, err := s.mysql.SelectAccountByPhone(req.Value)
 		if err != nil {
 			return req, nil, http.StatusInternalServerError, fmt.Errorf("mysql select account failed. err: [%v]", err)
 		}
@@ -38,7 +38,7 @@ func (s *Service) VerifyAccount(rid string, c *gin.Context) (interface{}, interf
 	}
 
 	if req.Field == "email" {
-		account, err := s.db.SelectAccountByEmail(req.Value)
+		account, err := s.mysql.SelectAccountByEmail(req.Value)
 		if err != nil {
 			return req, nil, http.StatusInternalServerError, fmt.Errorf("mysql select account failed. err: [%v]", err)
 		}
@@ -49,7 +49,7 @@ func (s *Service) VerifyAccount(rid string, c *gin.Context) (interface{}, interf
 	}
 
 	if req.Field == "username" {
-		account, err := s.db.SelectAccountByPhoneOrEmail(req.Value)
+		account, err := s.mysql.SelectAccountByPhoneOrEmail(req.Value)
 		if err != nil {
 			return req, nil, http.StatusInternalServerError, fmt.Errorf("mysql select account failed. err: [%v]", err)
 		}

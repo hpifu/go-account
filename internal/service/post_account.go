@@ -39,7 +39,7 @@ func (s *Service) POSTAccount(rid string, c *gin.Context) (interface{}, interfac
 	}
 
 	birthday, _ := time.Parse("2006-01-02", req.Birthday)
-	ok, err := s.db.InsertAccount(&mysql.Account{
+	ok, err := s.mysql.InsertAccount(&mysql.Account{
 		Phone:     req.Phone,
 		Email:     req.Email,
 		Password:  req.Password,
