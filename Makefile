@@ -27,6 +27,7 @@ deploytest:
 		-e ACCOUNT_MYSQL_URI="hatlonely:keaiduo1@tcp(test-mysql:3306)/hads?charset=utf8&parseTime=True&loc=Local" \
 		-e ACCOUNT_REDIS_ADDR="test-redis:6379" \
 		-e ACCOUNT_SERVICE_PORT=":16060" \
+		-e ACCOUNT_GODTOKEN_ADDRESS="test-go-godtoken:17060" \
 		${dockeruser}/${repository}:${version}
 
 .PHONY: remove
@@ -94,7 +95,7 @@ dockerbehave: buildenv
 
 output: cmd/*/*.go internal/*/*.go scripts/version.sh Makefile vendor
 	@echo "compile"
-	@go build -ldflags "-X 'main.AppVersion=`sh scripts/version.sh`'" cmd/${binary}/main.go && \
+	@go build -i -ldflags "-X 'main.AppVersion=`sh scripts/version.sh`'" cmd/${binary}/main.go && \
 	mkdir -p output/${repository}/bin && mv main output/${repository}/bin/${binary} && \
 	mkdir -p output/${repository}/configs && cp configs/${binary}/* output/${repository}/configs && \
 	mkdir -p output/${repository}/log
