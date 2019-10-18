@@ -24,7 +24,7 @@ deploytest:
 		docker stop test-go-account && docker rm test-go-account; \
 	fi
 	docker run --name test-go-account --hostname test-go-account --network testnet -d \
-		-e ACCOUNT_MYSQL_URI="hatlonely:keaiduo1@tcp(test-mysql:3306)/hads?charset=utf8&parseTime=True&loc=Local" \
+		-e ACCOUNT_MYSQL_URI="hatlonely:keaiduo1@tcp(test-mysql:3306)/account?charset=utf8&parseTime=True&loc=Local" \
 		-e ACCOUNT_REDIS_ADDR="test-redis:6379" \
 		-e ACCOUNT_SERVICE_PORT=":16060" \
 		-e ACCOUNT_GODTOKEN_ADDRESS="test-go-godtoken:17060" \
