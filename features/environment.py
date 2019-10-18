@@ -21,7 +21,10 @@ config = {
     "service": {
         "port": 16060,
         "cookieSecure": False,
-        "allowOrigins": ["http://127.0.0.1:4000"],
+        "allowOrigins": [
+            "http://127.0.0.1:4000",
+            "http://127.0.0.1:4001"
+        ],
         "cookieDomain": "127.0.0.1"
     },
     "godtoken": {
