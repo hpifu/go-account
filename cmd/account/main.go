@@ -27,6 +27,7 @@ import (
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"gopkg.in/sohlich/elogrus.v7"
+	"google.golang.org/grpc/keepalive"
 )
 
 // AppVersion name
@@ -107,9 +108,15 @@ func main() {
 	infoLog.Infof("init redis success. option [%#v]", option)
 
 	// init godtoken client
+	var kacp = keepalive.ClientParameters{
+		Time:                10 * time.Second, // send pings every 10 seconds if there is no activity
+		Timeout:             time.Second,      // wait 1 second for ping ack before considering the connection dead
+		PermitWithoutStream: true,             // send pings even without active streams
+	}
 	conn, err := grpc.Dial(
 		config.GetString("godtoken.address"),
 		grpc.WithInsecure(),
+		grpc.WithKeepaliveParams(kacp),
 	)
 	if err != nil {
 		panic(err)
