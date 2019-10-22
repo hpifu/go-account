@@ -8,10 +8,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var InfoLog *logrus.Logger = logrus.New()
-var WarnLog *logrus.Logger = logrus.New()
-var AccessLog *logrus.Logger = logrus.New()
-
 type Service struct {
 	mysql       *mysql.Mysql
 	redis       *redis.Redis
@@ -19,6 +15,15 @@ type Service struct {
 	godtokenCli godtoken.ServiceClient
 	secure      bool
 	domain      string
+	infoLog     *logrus.Logger
+	warnLog     *logrus.Logger
+	accessLog   *logrus.Logger
+}
+
+func (s *Service) SetLogger(infoLog, warnLog, accessLog *logrus.Logger) {
+	s.infoLog = infoLog
+	s.warnLog = warnLog
+	s.accessLog = accessLog
 }
 
 func NewService(
@@ -36,5 +41,8 @@ func NewService(
 		godtokenCli: godtokenCli,
 		secure:      secure,
 		domain:      domain,
+		infoLog:     logrus.New(),
+		warnLog:     logrus.New(),
+		accessLog:   logrus.New(),
 	}
 }

@@ -26,8 +26,8 @@ import (
 	"github.com/olivere/elastic/v7"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
-	"gopkg.in/sohlich/elogrus.v7"
 	"google.golang.org/grpc/keepalive"
+	"gopkg.in/sohlich/elogrus.v7"
 )
 
 // AppVersion name
@@ -74,10 +74,6 @@ func main() {
 		panic(err)
 	}
 	accessLog.Hooks.Add(hook)
-
-	service.InfoLog = infoLog
-	service.WarnLog = warnLog
-	service.AccessLog = accessLog
 
 	// init mysql
 	db, err := mysql.NewMysql(config.GetString("mysql.uri"))
@@ -136,6 +132,7 @@ func main() {
 	origins := config.GetStringSlice("service.allowOrigins")
 	// init services
 	svc := service.NewService(db, cache, mc, godtokenCli, secure, domain)
+	svc.SetLogger(infoLog, warnLog, accessLog)
 
 	// init gin
 	gin.SetMode(gin.ReleaseMode)
