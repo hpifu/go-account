@@ -31,14 +31,16 @@ require (
 	github.com/gin-gonic/gin v1.4.0
 	github.com/go-redis/redis v6.15.2+incompatible
 	github.com/hpifu/go-godtoken v1.0.2
-	github.com/hpifu/go-kit v1.6.6
+	github.com/hpifu/go-kit v1.6.7
 	github.com/hpifu/pb-constant v1.0.3
 	github.com/jinzhu/gorm v1.9.8
 	github.com/lestrrat-go/file-rotatelogs v2.2.0+incompatible
+	github.com/olivere/elastic/v7 v7.0.8
 	github.com/onsi/ginkgo v1.10.1 // indirect
 	github.com/onsi/gomega v1.7.0 // indirect
 	github.com/sirupsen/logrus v1.4.2
 	github.com/smartystreets/goconvey v0.0.0-20190731233626-505e41936337
 	github.com/spf13/viper v1.4.0
 	google.golang.org/grpc v1.21.0
+	gopkg.in/sohlich/elogrus.v7 v7.0.0
 )

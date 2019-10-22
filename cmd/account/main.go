@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"os"
 	"os/signal"
@@ -22,8 +23,10 @@ import (
 	"github.com/hpifu/go-kit/hhttp"
 	"github.com/hpifu/go-kit/logger"
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
+	"github.com/olivere/elastic/v7"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
+	"gopkg.in/sohlich/elogrus.v7"
 )
 
 // AppVersion name
@@ -54,18 +57,22 @@ func main() {
 	}
 
 	// init logger
-	infoLog, err := logger.NewTextLoggerWithViper(config.Sub("logger.infoLog"))
+	infoLog, warnLog, accessLog, err := logger.NewLoggerGroupWithViper(config.Sub("logger"))
 	if err != nil {
 		panic(err)
 	}
-	warnLog, err := logger.NewTextLoggerWithViper(config.Sub("logger.warnLog"))
+	client, err := elastic.NewClient(
+		elastic.SetURL(config.GetString("es.uri")),
+		elastic.SetSniff(false),
+	)
 	if err != nil {
 		panic(err)
 	}
-	accessLog, err := logger.NewJsonLoggerWithViper(config.Sub("logger.accessLog"))
+	hook, err := elogrus.NewAsyncElasticHook(client, "go-account", logrus.InfoLevel, "go-account-log")
 	if err != nil {
 		panic(err)
 	}
+	accessLog.Hooks.Add(hook)
 
 	service.InfoLog = infoLog
 	service.WarnLog = warnLog

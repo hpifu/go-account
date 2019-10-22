@@ -11,6 +11,9 @@
     "mysql": {
         "uri": "hatlonely:keaiduo1@tcp(mysql:3306)/account?charset=utf8&parseTime=True&loc=Local"
     },
+    "es": {
+        "uri": "http://elasticsearch:9200"
+    },
     "godtoken": {
         "address": "go-godtoken:7060"
     },
