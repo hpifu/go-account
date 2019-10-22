@@ -28,6 +28,7 @@ deploytest:
 		-e ACCOUNT_REDIS_ADDR="test-redis:6379" \
 		-e ACCOUNT_SERVICE_PORT=":16060" \
 		-e ACCOUNT_GODTOKEN_ADDRESS="test-go-godtoken:17060" \
+		-e ACCOUNT_ES_URI="http://test-elasticsearch:9200" \
 		${dockeruser}/${repository}:${version}
 
 .PHONY: remove
