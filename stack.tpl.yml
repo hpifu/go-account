@@ -13,6 +13,7 @@ services:
       - ${repository}net
       - mysqlnet
       - redisnet
+      - elasticsearchnet
 networks:
   ${repository}net:
     name: ${repository}net
@@ -22,3 +23,6 @@ networks:
   mysqlnet:
     external: true
     name: mysqlnet
+  elasticsearchnet:
+    external: true
+    name: elasticsearchnet
